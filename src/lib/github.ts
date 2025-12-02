@@ -1,8 +1,8 @@
 import { App, Octokit } from 'octokit';
 import type { ActionResponse, Feedback } from '@/components/feedback';
 
-export const repo = 'vidhyagopinadh';
-export const owner = 'fuma-docs-spry';
+export const repo = 'spry-docs';
+export const owner = 'programmablemd';
 export const DocsCategory = 'Docs Feedback';
 
 let instance: Octokit | undefined;

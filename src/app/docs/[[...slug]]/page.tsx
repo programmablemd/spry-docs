@@ -23,8 +23,8 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const MDX = page.data.body;
 
   const time = await getGithubLastEdit({
-    owner: 'vidhyagopinadh',
-    repo: 'fuma-docs-spry',
+    owner: 'programmablemd',
+    repo: 'spry-docs',
     path: `content/docs/${page.path}`,
   });
 
@@ -40,7 +40,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
         <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
         <ViewOptions
           markdownUrl={`${page.url}.mdx`}
-          githubUrl={`https://github.com/${owner}/${repo}/blob/dev/apps/docs/content/docs/${page.path}`}
+          githubUrl={`https://github.com/${owner}/${repo}/tree/main/content/docs/${page.path}`}
         />
       </div>
       <DocsBody>

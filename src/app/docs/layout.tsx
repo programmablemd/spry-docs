@@ -36,7 +36,10 @@ export default function Layout({ children }: LayoutProps<'/docs'>) {
       }}
     >
       {children}
-      <AISearchTrigger />
+      <div className='fixed !right-0 w-[100px]'>
+        <AISearchTrigger />
+      </div>
+
     </DocsLayout>
   );
 }

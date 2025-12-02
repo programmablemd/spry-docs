@@ -1,4 +1,3 @@
-import { FumadocsIcon } from '@/app/layout.client';
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import Image from 'next/image';
 
@@ -7,15 +6,10 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       title: (
         <div className="flex items-center gap-2">
-          <Image src="/logo.png" alt="Sprymd Logo" width={32} height={32} className="rounded" />
-          <span>Sprymd Docs</span>
+          <Image src="/logo.png" alt="Spry Logo" width={32} height={32} className="rounded" />
+          <span>Spry Docs</span>
         </div>
       ),
     },
   };
 }
-export const logo = (
-  <>
-   <FumadocsIcon className="size-5 in-[.uwu]:hidden" />
-  </>
-);

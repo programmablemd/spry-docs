@@ -13,7 +13,6 @@ import { Feedback } from '@/components/feedback';
 import { saveFeedback } from '@/lib/feedback';
 import { headers } from 'next/headers';
 import { LLMCopyButton, ViewOptions } from '@/components/ai/page-actions';
-import { owner, repo } from '@/lib/github';
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
   const page = source.getPage(params.slug);
@@ -33,10 +32,10 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
       <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
       <div className="flex flex-row flex-wrap gap-2 items-center border-b pb-6">
         <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
-        <ViewOptions
+        {/* <ViewOptions
           markdownUrl={`${page.url}.mdx`}
           githubUrl={`https://github.com/${owner}/${repo}/blob/dev/apps/docs/content/docs/${page.path}`}
-        />
+        /> */}
       </div>
       <DocsBody>
         <MDX

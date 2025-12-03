@@ -1,0 +1,628 @@
+---
+title: Architecture Deep Dive
+description: Programmable Markdown Document Model
+icon: Layers
+index: 8
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Steps, Step } from 'fumadocs-ui/components/steps';
+
+Spry is a sophisticated Markdown-based automation framework that transforms Markdown documents into executable workflows. It uses a layered architecture that parses, enriches, and executes code blocks embedded in Markdown files.
+
+## Architecture Layers
+
+### 1. Application Layer (Entry Points)
+
+The top layer provides CLI interfaces for different use cases:
+
+- **`runbook/cli.ts`** - Shell script orchestration from Markdown
+- **`sqlpage/cli.ts`** - SQLPage integration for web applications
+- **`task/cli.ts`** - Generic task execution engine
+
+Each CLI module provides commands that users interact with directly (e.g., `spry runbook execute`, `spry task run`).
+
+### 2. Execution Engines
+
+This layer handles the actual execution logic:
+
+- **`runbook/orchestrate`** - Executes shell commands from code blocks, manages dependencies, captures output
+- **`task/execute`** - Generic task execution with DAG (Directed Acyclic Graph) planning and state management
+- **`sqlpage/playbook`** - Specialized execution for SQL queries and web content generation
+
+**Key Responsibilities:**
+
+- Parse task directives from code cells
+- Build dependency graphs
+- Execute tasks in correct order
+- Capture and manage output
+- Handle errors and retries
+
+### 3. Markdown AST Pipeline
+
+The core transformation layer that enriches raw Markdown with metadata:
+
+#### Plugin System (`remark/plugin/`)
+
+**Document-level plugins:**
+- `doc-frontmatter` - Extracts YAML frontmatter from documents
+- `doc-schema` - Validates document structure against schemas
+
+**Node-level plugins:**
+- `code-frontmatter` - Parses processing instructions from code fence info strings
+- `code-partial` - Identifies reusable code blocks
+- `heading-frontmatter` - Extracts metadata from heading comments
+- `node-classify` - Categorizes nodes by type and purpose
+
+#### AST Control (`remark/mdastctl/`)
+
+- `io.ts` - File loading and AST reading/writing
+- `view.ts` - AST visualization and debugging utilities
+
+### 4. Markdown Document Model
+
+High-level abstractions over the AST:
+
+- **`governedmd.ts`** - Core types: `CodeCell`, `Issue`, `Source`
+- **`fluent-doc.ts`** - Builder API for constructing Markdown documents programmatically
+- **`notebook/`** - Document structures:
+  - `notebook.ts` - Collection of cells with frontmatter
+  - `playbook.ts` - Sections and execution context
+  - `partial.ts` - Reusable code block management
+  - `pseudo-cell.ts` - Dynamically generated cells
+
+### 5. Unified/Remark Parsing
+
+Foundation layer using the [unified](https://unifiedjs.com/) ecosystem:
+
+- Parses raw Markdown into MDAST (Markdown Abstract Syntax Tree)
+- Provides standardized tree transformation interface
+- Enables plugin composition
+
+### 6. Universal Utilities
+
+Cross-cutting utilities used throughout:
+
+- **`task.ts`** - DAG execution engine with dependency resolution
+- **`shell.ts`** - Shell command execution wrapper
+- **`event-bus.ts`** - Type-safe event system
+- **`depends.ts`** - Dependency resolution algorithms
+- **`code.ts`** - Language registry and detection
+- **`interpolate.ts`** - Template variable substitution
+- **`posix-pi.ts`** - Processing instruction parser
+- **`resource.ts`** - Content fetching and caching
+
+## Core Concepts
+
+### Code Cells
+
+The fundamental unit of executable content:
+
+```typescript
+interface CodeCell {
+  kind: "code"
+  language: string        // e.g., "bash", "sql", "typescript"
+  source: string          // The actual code
+  startLine: number       // Source location
+  endLine: number
+  pi?: string            // Processing instructions (flags)
+  parsedPI?: PosixStylePI // Parsed flags and arguments
+  attrs?: object         // JSON5 attributes
+}
+```
+
+**Example Markdown:**
+
+```markdown
+```bash my-task --dep other-task --capture output
+echo "Hello World"
+` ` `
+```
+
+Becomes a CodeCell with:
+- `language`: "bash"
+- `pi`: "my-task --dep other-task --capture output"
+- `parsedPI.flags`: `{ dep: "other-task", capture: "output" }`
+
+### Task Directives
+
+Instructions extracted from code cells that define executable tasks:
+
+```typescript
+interface TaskDirective {
+  nature: "TASK" | "CONTENT"  // Executable vs display-only
+  identity: string            // Unique task name
+  language: LanguageSpec      // How to execute it
+  deps?: string[]             // Task dependencies
+}
+```
+
+Tasks with dependencies form a DAG that determines execution order.
+
+### Processing Instructions (PI)
+
+POSIX-style flags in code fence info strings:
+
+```
+bash task-name --flag value --boolean-flag { "json": "attrs" }
+```
+
+Parsed into:
+
+- **Positional tokens**: `["bash", "task-name"]`
+- **Flags**: `{ flag: "value", booleanFlag: true }`
+- **Attributes**: `{ json: "attrs" }`
+
+### Dependency Resolution
+
+Tasks declare dependencies via `--dep` flags:
+
+```markdown
+```bash task-a
+echo "First"
+` ` `
+
+```bash task-b --dep task-a
+echo "Depends on task-a"
+` ` `
+```
+
+The system:
+
+1. Builds dependency graph
+2. Detects cycles
+3. Computes topological order
+4. Executes in correct sequence
+
+## Data Flow
+
+### From Markdown to Execution
+
+```text
+┌─────────────────┐
+│  Spryfile.md    │  Raw Markdown source
+└────────┬────────┘
+         │
+         │ remark.parse()
+         ▼
+┌─────────────────┐
+│   MDAST Tree    │  Abstract Syntax Tree
+└────────┬────────┘
+         │
+         │ Plugins (doc-frontmatter, code-frontmatter, etc.)
+         ▼
+┌─────────────────┐
+│  Enriched MDAST │  Tree with metadata in node.data
+└────────┬────────┘
+         │
+         │ Notebook constructor
+         ▼
+┌─────────────────┐
+│   Notebook      │  { frontmatter, cells[], issues[] }
+└────────┬────────┘
+         │
+         │ Playbook constructor
+         ▼
+┌─────────────────┐
+│   Playbook      │  Organized sections with context
+└────────┬────────┘
+         │
+         │ Task directive extraction
+         ▼
+┌─────────────────┐
+│  TaskCell[]     │  Cells with taskId() and taskDeps()
+└────────┬────────┘
+         │
+         │ DAG planning
+         ▼
+┌─────────────────┐
+│ Execution Plan  │  Topologically sorted task order
+└────────┬────────┘
+         │
+         │ Task execution
+         ▼
+┌─────────────────┐
+│   Results       │  Output, captured data, errors
+└─────────────────┘
+```
+
+## Key Design Patterns
+
+### 1. Safe Node Data Pattern
+
+Type-safe metadata attachment to AST nodes:
+
+```typescript
+// Define typed data key
+const codeFrontmatterNDF = nodeDataFactory<"codeFM", CodeFrontmatter>("codeFM")
+
+// Use safely with type checking
+if (codeFrontmatterNDF.is(node)) {
+  const fm = node.data.codeFM  // TypeScript knows the type
+}
+```
+
+With validation:
+
+```typescript
+const codeSpawnableSNDF = safeNodeDataFactory(
+  "codeSpawnable",
+  codeSpawnableSchema,  // Zod schema
+  {
+    onAttachSafeParseError: ({ node, error }) => {
+      // Handle validation errors
+    }
+  }
+)
+```
+
+### 2. Plugin Pipeline
+
+Plugins compose in order, each transforming the tree:
+
+```typescript
+const processor = remark()
+  .use(remarkGfm)           // 1. GitHub Flavored Markdown
+  .use(remarkFrontmatter)   // 2. Enable YAML frontmatter
+  .use(docFrontmatter)      // 3. Parse frontmatter
+  .use(codeFrontmatter)     // 4. Parse code fence metadata
+  .use(codePartials)        // 5. Identify partials
+  .use(nodeClassify)        // 6. Classify nodes
+
+const tree = processor.parse(markdown)
+processor.runSync(tree)  // Run all plugins
+```
+
+Each plugin adds data to `node.data[KEY]` without modifying the original tree structure.
+
+### 3. Event Bus Pattern
+
+Type-safe, decoupled communication:
+
+```typescript
+interface TaskEvents {
+  "task:start": { task: TaskCell; ctx: Context }
+  "task:complete": { task: TaskCell; result: Result }
+  "task:error": { task: TaskCell; error: Error }
+}
+
+const bus = eventBus<TaskEvents>()
+
+// Subscribe
+bus.on("task:start", ({ task }) => {
+  console.log(`Starting ${task.taskId()}`)
+})
+
+// Emit
+bus.emit("task:start", { task, ctx })
+```
+
+Used for:
+- Task lifecycle events
+- Shell command output
+- Interpolation resolution
+- Error reporting
+
+### 4. DAG Execution Engine
+
+Generic task orchestration with dependency resolution:
+
+```typescript
+interface Task {
+  taskId(): string
+  taskDeps(): string[]
+}
+
+// Build execution plan
+const plan = planDAG(tasks, {
+  getId: (t) => t.taskId(),
+  getDeps: (t) => t.taskDeps()
+})
+
+// Execute in topological order
+await executeDAG(plan, async (task, ctx) => {
+  const result = await runTask(task)
+  return ok({ ...ctx, results: [...ctx.results, result] })
+}, { eventBus })
+```
+
+Features:
+- Cycle detection
+- Missing dependency errors
+- Parallel execution (when possible)
+- Error propagation
+
+### 5. Schema-Driven Validation
+
+Zod schemas for runtime validation and type inference:
+
+```typescript
+const taskFlagsSchema = z.object({
+  descr: z.string().optional(),
+  dep: flexibleTextSchema.optional(),
+  capture: z.string().optional()
+}).transform((raw) => ({
+  description: raw.descr,
+  dependencies: Array.isArray(raw.dep) ? raw.dep : [raw.dep],
+  captureAs: raw.capture
+}))
+
+type TaskFlags = z.infer<typeof taskFlagsSchema>
+```
+
+Benefits:
+
+- Runtime validation
+- Automatic TypeScript types
+- Transform/normalization
+- Helpful error messages
+
+## Module Organization
+
+### `/lib/markdown/` - Document Model
+
+Core document abstractions:
+
+- **governedmd.ts** - Base types (`CodeCell`, `Issue`, `Source`)
+- **fluent-doc.ts** - Builder API for creating Markdown
+- **notebook/** - Higher-level structures
+  - Notebook: cells + frontmatter
+  - Playbook: sections + execution context
+  - Partial: reusable blocks
+  - Pseudo-cell: generated cells
+
+### `/lib/remark/` - AST Processing
+
+Markdown tree manipulation:
+
+- **mdast/** - MDAST utilities
+  - `safe-data.ts` - Type-safe node data
+  - `issue.ts` - Error/warning tracking
+  - `node-src-text.ts` - Source extraction
+
+- **mdastctl/** - High-level control
+  - `io.ts` - File I/O
+  - `view.ts` - Visualization
+
+- **plugin/** - Transformations
+  - Document-level: frontmatter, schema
+  - Node-level: code metadata, partials
+
+### `/lib/task/` - Task Execution
+
+Generic task engine:
+
+- **cell.ts** - TaskCell and TaskDirective types
+- **execute.ts** - Execution state management
+- **cli.ts** - CLI commands
+
+### `/lib/runbook/` - Shell Orchestration
+
+Shell-specific execution:
+
+- **orchestrate.ts** - CodeSpawnable type, execution logic
+- **cli.ts** - Runbook commands
+
+### `/lib/sqlpage/` - SQLPage Integration
+
+Web application generation:
+
+- **cli.ts** - Init and serve commands
+- **playbook.ts** - SQL task definitions
+- **route.ts** - URL routing
+- **content.ts** - Page generation
+
+### `/lib/universal/` - Shared Utilities
+
+Cross-cutting concerns (50+ modules):
+
+- Task execution (`task.ts`)
+- Shell commands (`shell.ts`)
+- Event system (`event-bus.ts`)
+- Dependency resolution (`depends.ts`)
+- Language detection (`code.ts`)
+- Template interpolation (`interpolate.ts`)
+- Flag parsing (`posix-pi.ts`)
+- And many more...
+
+## Extension Points
+
+### Custom Remark Plugins
+
+Add new metadata to AST nodes:
+
+```typescript
+import { Plugin } from "unified"
+import { visit } from "unist-util-visit"
+
+export const myPlugin: Plugin = (options) => {
+  return (tree) => {
+    visit(tree, "code", (node) => {
+      node.data ??= {}
+      node.data.myCustomData = analyzeCode(node)
+    })
+  }
+}
+```
+
+### Custom Task Inspectors
+
+Handle new language types:
+
+```typescript
+import { TaskDirectiveInspector } from "./cell.ts"
+
+const myInspector: TaskDirectiveInspector = ({ cell, pb }) => {
+  if (cell.language === "my-language") {
+    return {
+      nature: "TASK",
+      identity: cell.parsedPI?.firstToken ?? "unnamed",
+      language: myLanguageSpec,
+      deps: cell.parsedPI?.flags.dep
+    }
+  }
+  return false  // Not handled by this inspector
+}
+```
+
+### Custom Event Handlers
+
+React to execution events:
+
+```typescript
+const bus = eventBus<TaskExecEventMap>()
+
+bus.on("task:start", ({ task }) => {
+  console.log(`▶ ${task.taskId()}`)
+})
+
+bus.on("task:complete", ({ task, result }) => {
+  console.log(`✓ ${task.taskId()} - ${result.duration}ms`)
+})
+
+bus.on("task:error", ({ task, error }) => {
+  console.error(`✗ ${task.taskId()} - ${error.message}`)
+})
+```
+
+## Testing Strategy
+
+Tests follow the `*_test.ts` pattern adjacent to source files:
+
+```typescript
+// code-frontmatter_test.ts
+Deno.test("CodeFrontmatter plugin", async (t) => {
+  await t.step("parses basic flags", () => {
+    const md = "```bash task --flag\ncode\n```"
+    const tree = pipeline().parse(md)
+    pipeline().runSync(tree)
+    
+    const node = findCode(tree)
+    assertEquals(node.data.codeFM.pi.flags.flag, true)
+  })
+  
+  await t.step("handles dependencies", () => {
+    const md = "```bash task --dep dep1 --dep dep2\ncode\n```"
+    const tree = pipeline().parse(md)
+    pipeline().runSync(tree)
+    
+    const node = findCode(tree)
+    assertEquals(node.data.codeFM.pi.flags.dep, ["dep1", "dep2"])
+  })
+})
+```
+
+Run tests:
+
+```bash
+deno test --parallel --allow-all
+```
+
+## Real-World Example
+
+Given this Markdown file:
+
+```markdown
+---
+title: Deploy Application
+version: 1.0
+---
+
+# Deployment Tasks
+
+```bash build --capture image-name
+docker build -t myapp:latest .
+echo "myapp:latest"
+` ` `
+
+```bash test --dep build
+docker run myapp:latest npm test
+` ` `
+
+```bash deploy --dep test --dep build
+docker push ${image-name}
+kubectl apply -f deploy.yml
+` ` `
+```
+
+Spry will:
+
+<Steps>
+  <Step>
+    ### Parse
+    Parse into MDAST with 3 code nodes
+  </Step>
+
+  <Step>
+    ### Enrich
+    Enrich with plugins:
+    - Extract frontmatter: `{ title: "Deploy Application", version: "1.0" }`
+    - Parse code metadata: flags, dependencies
+  </Step>
+
+  <Step>
+    ### Build
+    Build Notebook with 3 CodeCells
+  </Step>
+
+  <Step>
+    ### Create
+    Create Playbook with execution context
+  </Step>
+
+  <Step>
+    ### Extract
+    Extract TaskCells:
+    - `build` (no deps, captures `image-name`)
+    - `test` (depends on `build`)
+    - `deploy` (depends on `test` and `build`)
+  </Step>
+
+  <Step>
+    ### Plan
+    Plan DAG: `build → test → deploy`
+  </Step>
+
+  <Step>
+    ### Execute
+    Execute:
+    - Run `build`, capture output → `image-name = "myapp:latest"`
+    - Run `test` with built image
+    - Run `deploy`, interpolating `${image-name}` → `docker push myapp:latest`
+  </Step>
+</Steps>
+
+## Summary
+
+Spry's architecture is built on these principles:
+
+<Cards>
+  <Card title="Layered Separation">
+    Clear separation of concerns (parse → enrich → execute)
+  </Card>
+
+  <Card title="Plugin Composability">
+    Extensible through remark plugins
+  </Card>
+
+  <Card title="Type Safety">
+    Strong typing through Zod schemas and TypeScript
+  </Card>
+
+  <Card title="Declarative Dependencies">
+    Dependencies defined via processing instructions
+  </Card>
+
+  <Card title="Event-Driven">
+    Observable execution through event bus
+  </Card>
+
+  <Card title="Universal Utilities">
+    Shared utilities for code reuse
+  </Card>
+</Cards>
+
+<Callout>
+This design enables powerful automation workflows defined in readable Markdown, with strong guarantees about execution order and type safety throughout.
+</Callout>

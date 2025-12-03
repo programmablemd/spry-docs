@@ -3,7 +3,8 @@
   "icon": "Heart",
   "pages": [
     "contributing-to-spry",
-    "spry-help"
+    "spry-help",
+    "code-contributor-guide"
   ],
   "root": true
 }

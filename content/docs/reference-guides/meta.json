@@ -1,6 +1,6 @@
 {
   "title": "Reference Guides",
   "icon": "BookOpen",
-  "pages": ["configuration", "cli-commands", "cli"],
+  "pages": ["configuration", "cli-commands", "cli", "axiom"],
   "root": true
 }

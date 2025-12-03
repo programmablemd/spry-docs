@@ -1,0 +1,450 @@
+---
+title: Code Contributor Guide
+description: Technical setup, repository structure, architecture, and workflow for contributing source code to Spry.
+icon: Code
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+This guide is for developers who plan to work directly on the Spry source code. It covers the project structure, development commands, core architecture, and best practices for creating extensions.
+
+## Architecture Context
+
+Spry's pipeline is divided into three fundamental layers, defining the execution flow. Understanding this is crucial: **Parsing happens first, execution happens last.**
+
+<Callout type="info">
+The three-layer architecture ensures clean separation of concerns between parsing, execution, and application interfaces.
+</Callout>
+
+1. **Markdown AST Pipeline** (`remark/*`): The core engine for parsing Markdown, enriching the Abstract Syntax Tree (AST) with metadata, and extracting tasks.
+2. **Execution Engines** (`runbook/orchestrate`, `task/execute`, `sqlpage/playbook`): Manages control flow, execution state, and coordinates tasks.
+3. **Application Layer** (`runbook/cli.ts`, `sqlpage/cli.ts`, `task/cli.ts`): Handles command line interface, argument parsing, and orchestrates the engines.
+
+```text
+┌───────────────────────────────────────────────────────────────┐
+│                       APPLICATION LAYER                         │
+├───────────────────────────────────────────────────────────────┤
+│  lib/runbook/cli.ts  │  lib/sqlpage/cli.ts  │  lib/task/cli.ts  │
+└──────────┬────────────────────┬─────────────────┬───────────────┘
+           │                    │                 │
+           ▼                    ▼                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      EXECUTION ENGINES                           │
+├─────────────────────────────────────────────────────────────────┤
+│ lib/runbook/orchestrate  │  lib/task/execute  │  lib/sqlpage/playbook│
+└──────────┬──────────────────────┬──────────────────────────────┘
+           │                      │
+           ▼                      ▼
+┌───────────────────────────────────────────────────────────────┐
+│                    MARKDOWN AST PIPELINE                         │
+├───────────────────────────────────────────────────────────────┤
+│  lib/remark/plugin/* (code-frontmatter, doc-schema, etc)        │
+│  lib/remark/graph/* (dependency tracking, analysis)             │
+│  lib/remark/mdastctl/* (AST loading and manipulation)           │
+└───────────────────────────────────────────────────────────────┘
+```
+
+## Project Structure
+
+Spry's core logic is organized within the `lib/` directory:
+
+```text
+spry/
+├── lib/                 # Core library source
+│   ├── markdown/        # Document model and notebook structures (cql, playbook, etc.)
+│   ├── reflect/         # Runtime reflection, provenance, and dependency tracking
+│   ├── remark/          # Markdown AST processing (plugins, graph analysis, mdast utilities)
+│   ├── runbook/         # Shell task orchestration and CLI runner
+│   ├── sqlpage/         # SQLPage content generation and CLI
+│   ├── task/            # Task cell definition and execution engine
+│   └── universal/       # Shared utilities (CLI helpers, file I/O, general code tools)
+├── support/             # Examples, complex fixtures (assurance), RFCs, and helper scripts
+├── deno.jsonc           # Deno configuration
+└── import_map.json      # Import map for remote usage
+```
+
+## Development Workflow
+
+This section outlines the standard steps for contributing code.
+
+### Creating a Branch
+
+Always create a new branch for your work:
+
+```bash
+git checkout -b feature/your-feature-name
+# or
+git checkout -b fix/your-bug-fix
+```
+
+Use descriptive branch names:
+
+- `feature/add-python-support`
+- `fix/sql-parsing-error`
+- `docs/improve-quickstart`
+
+### Making Changes
+
+<Steps>
+
+<Step>
+
+#### Write Clean, Maintainable Code
+
+- Follow **TypeScript best practices** (prefer `const`, strict typing)
+- Use meaningful variable and function names
+- Add **JSDoc comments** for complex logic and public APIs
+
+</Step>
+
+<Step>
+
+#### Update Documentation
+
+- Update relevant `.md` files in `docs/`
+- Add examples if introducing new features
+
+</Step>
+
+<Step>
+
+#### Commit Your Changes
+
+```bash
+git add .
+git commit -m "feat: add Python execution support"
+```
+
+</Step>
+
+</Steps>
+
+## Local Development Workflow
+
+<Callout type="warn">
+It is critical to run checks frequently while developing.
+</Callout>
+
+| Check | Command | Purpose |
+| :--- | :--- | :--- |
+| **Tests** | `deno test --parallel --allow-all` | Run all unit and integration tests |
+| **Watch Mode** | `deno test --watch --allow-all` | **Recommended** for continuous development |
+| **Formatting** | `deno fmt` | Fix code formatting based on project standards |
+| **Linting** | `deno lint` | Static analysis to catch structural issues |
+| **Type Checking** | `deno task ts-check` | Verify strict TypeScript compliance |
+
+## Commit Message Guidelines
+
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for clear, standardized commit history.
+
+| Prefix | Description | Example |
+| :--- | :--- | :--- |
+| `feat:` | A new feature | `feat: add PostgreSQL connection pooling` |
+| `fix:` | A bug fix | `fix: resolve SQL injection vulnerability` |
+| `docs:` | Documentation only changes | `docs: update installation guide for Windows` |
+| `style:` | Code style changes | `style: fix missing semicolon in tsconfig` |
+| `refactor:` | Code refactoring without changing functionality | `refactor: simplify task dependency resolution` |
+| `perf:` | Performance improvements | `perf: optimize AST traversal speed` |
+| `test:` | Adding or updating tests | `test: add coverage for partials feature` |
+| `chore:` | Maintenance tasks | `chore: update Deno version requirement` |
+
+## Submitting Pull Requests
+
+### Before Submitting
+
+<Steps>
+
+<Step>
+
+#### Sync with Upstream
+
+```bash
+git fetch upstream
+git rebase upstream/main
+```
+
+</Step>
+
+<Step>
+
+#### Run All Checks
+
+Run tests, format, lint, and type check before submitting.
+
+</Step>
+
+</Steps>
+
+### Creating the Pull Request
+
+<Steps>
+
+<Step>
+
+#### Push Your Branch
+
+```bash
+git push origin feature/your-feature-name
+```
+
+</Step>
+
+<Step>
+
+#### Open a Pull Request
+
+- Use a clear, descriptive title
+- Reference related issues (e.g., "Fixes #123")
+- Describe what changed and why
+
+</Step>
+
+</Steps>
+
+### PR Template
+
+We use this template to ensure all necessary information is provided for review:
+
+```markdown
+## Description
+Brief description of changes
+
+## Related Issues
+Fixes #123
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Testing
+How has this been tested?
+
+## Checklist
+- [ ] Tests pass locally
+- [ ] Code follows project style
+- [ ] Documentation updated
+- [ ] Commit messages follow conventions
+```
+
+## Code Style Guidelines
+
+### TypeScript
+
+<Accordions>
+
+<Accordion title="General Guidelines">
+
+- Use **TypeScript** for all source code
+- Enable **strict mode**
+- Prefer `const` over `let`, avoid `var`
+- Use descriptive type names
+
+</Accordion>
+
+<Accordion title="Documentation">
+
+**Document public APIs** with JSDoc comments:
+
+```typescript
+/**
+ * Executes a Markdown code block as a task
+ * @param cell - The code block to execute
+ * @param context - Execution context
+ * @returns Promise resolving to execution result
+ */
+export async function executeCell(
+  cell: CodeCell,
+  context: ExecutionContext
+): Promise<ExecutionResult> {
+  // Implementation
+}
+```
+
+</Accordion>
+
+</Accordions>
+
+### Markdown
+
+- Use **ATX-style headers** (`#` syntax)
+- Add blank lines around code blocks
+- Use **fenced code blocks** with language identifiers
+- Use **reference-style links** for readability
+
+## Testing Principles
+
+<Callout>
+Writing good tests is fundamental to Spry's stability.
+</Callout>
+
+- Write tests for **all new features**
+- Use descriptive test names
+- Follow the **Arrange-Act-Assert** pattern
+- Test edge cases and error conditions
+
+```typescript title="Example Test"
+Deno.test("executeCell: handles SQL queries correctly", async () => {
+  // Arrange
+  const cell = createSQLCell("SELECT 1");
+  const context = createTestContext();
+  
+  // Act
+  const result = await executeCell(cell, context);
+  
+  // Assert
+  assertEquals(result.success, true);
+  assertEquals(result.output, "1");
+});
+```
+
+## Advanced Contributions & Extensions
+
+Spry is highly extensible via custom modules.
+
+### Adding a New Remark Plugin
+
+Remark plugins transform or enrich the Markdown AST.
+
+<Steps>
+
+<Step>
+
+#### Create Plugin File
+
+Create your plugin file in `lib/remark/plugin/node/` (for code blocks) or `lib/remark/plugin/doc/` (for document-level metadata).
+
+</Step>
+
+<Step>
+
+#### Use Unified Utilities
+
+Use the `unified` and `unist-util-visit` utilities to traverse the tree.
+
+</Step>
+
+<Step>
+
+#### Attach Data
+
+Use `safeNodeDataFactory` to attach new, type-safe data to nodes.
+
+</Step>
+
+</Steps>
+
+```typescript title="lib/remark/plugin/node/my-plugin.ts"
+import { z } from "@zod/zod";
+import { safeNodeDataFactory } from "../../mdast/safe-data.ts";
+
+const myDataSchema = z.object({ value: z.string() });
+export type MyData = z.infer<typeof myDataSchema>;
+export const MY_KEY = "myData" as const;
+
+export const myPlugin: Plugin = (options) => {
+  return (tree) => {
+    // Transformer logic here
+  };
+};
+
+export default myPlugin;
+```
+
+### Extending Task Execution
+
+If you need Spry to recognize a new executable cell type, create a **Task Directive Inspector (TDI)**.
+
+<Steps>
+
+<Step>
+Create a `TaskDirectiveInspector` in `lib/task/`
+</Step>
+
+<Step>
+Your inspector checks the cell's language, flags, and attributes
+</Step>
+
+<Step>
+Register your inspector with the `TaskDirectives.use()` chain in the execution engine
+</Step>
+
+</Steps>
+
+### Custom Event Handlers
+
+The execution engines use an **Event Bus** to communicate state changes.
+
+```typescript title="Event Handler Example"
+// React to task execution events
+const tasksBus = eventBus<TaskExecEventMap>();
+
+tasksBus.on("task:start", ({ task, ctx }) => {
+  console.log(`Starting: ${task.taskId()}`);
+});
+
+tasksBus.on("task:complete", ({ task, result }) => {
+  console.log(`Completed: ${task.taskId()}`);
+});
+```
+
+## Technical Best Practices
+
+### Plugin Design Principles
+
+<Accordions>
+
+<Accordion title="Single Responsibility">
+Each plugin should do one thing well.
+</Accordion>
+
+<Accordion title="Idempotent">
+Running a plugin multiple times must be safe and produce the same result.
+</Accordion>
+
+<Accordion title="Type-Safe Data">
+Always use `safeNodeDataFactory` for AST data validation.
+</Accordion>
+
+<Accordion title="No Side Effects">
+Avoid file I/O or network calls within plugins; emit data for later processing by the execution layer.
+</Accordion>
+
+</Accordions>
+
+### Error Handling
+
+<Tabs items={['Validation Errors', 'Schema Errors', 'Fatal Errors']}>
+
+<Tab value="Validation Errors">
+Use `registerIssue` to track recoverable parsing errors.
+</Tab>
+
+<Tab value="Schema Errors">
+Use the validation built into `safeNodeDataFactory` to catch invalid data structures.
+</Tab>
+
+<Tab value="Fatal Errors">
+Only `throw` for truly unrecoverable situations.
+</Tab>
+
+</Tabs>
+
+### Performance
+
+<Callout type="info">
+Follow these guidelines to keep your contributions performant.
+</Callout>
+
+**Early Return**  
+Check the node type (`node.type === "code"`) immediately when traversing the AST to skip unnecessary work.
+
+**Avoid Reprocessing**  
+Check if your data already exists on `node.data` before running an expensive computation.
+
+**Batch Operations**  
+Collect data during a single tree visit, then process it afterward, instead of repeatedly visiting the tree.

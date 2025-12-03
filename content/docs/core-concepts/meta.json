@@ -10,7 +10,11 @@
     "common-workflows",
     "environment-variables",
     "dag",
-    "ast"
+    "ast",
+    "architecture-deep-drive",
+    "fundamental-building-blocks",
+    "plugin-development-guide",
+    "what-is-spry"
   ],
   "root": true
 }

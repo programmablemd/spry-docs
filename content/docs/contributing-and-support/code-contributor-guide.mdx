@@ -65,6 +65,58 @@ spry/
 ├── deno.jsonc           # Deno configuration
 └── import_map.json      # Import map for remote usage
 ```
+## Building Spry Executable Package from Source
+
+### Prerequisites
+
+- Docker with BuildKit support
+- Docker Buildx
+
+### Build Commands
+
+```bash
+# Build DEB package for Ubuntu Jammy
+docker buildx build \
+  --target jammy \
+  --output type=local,dest=./output \
+  -f dalec-spry-sqlpage.yaml \
+  .
+
+# Build Windows package (cross-compilation)
+docker buildx build \
+  --target windowscross \
+  --output type=local,dest=./output \
+  -f dalec-spry-sqlpage.yaml \
+  .
+```
+
+### Manual Compilation with Deno
+
+```bash
+# Download import_map.json
+curl -o import_map.json https://raw.githubusercontent.com/programmablemd/spry/refs/heads/main/import_map.json
+
+# Compile spry-sqlpage
+deno compile \
+  --allow-all \
+  --import-map=import_map.json \
+  --output=spry-sqlpage \
+  spry_sqlpage.ts
+
+# Compile spry-runbook
+deno compile \
+  --allow-all \
+  --import-map=import_map.json \
+  --output=spry-runbook \
+  spry_runbook.ts
+```
+
+### Supported Platforms
+
+- ✅ Ubuntu 22.04 (Jammy)
+- ✅ Debian 12 (Bookworm)
+- ✅ macOS (Intel & Apple Silicon)
+- ✅ Windows (x64)
 
 ## Development Workflow
 

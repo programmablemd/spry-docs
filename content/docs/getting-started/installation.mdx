@@ -8,15 +8,105 @@ index  : 1
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-## Prerequisites
+Installation can be done in two ways. 
+* By using the Execution Package
+* By using Deno.
+
+## Installation of Executable Package
+
+### Package Managers (Recommended)
+
+#### Homebrew (macOS & Linux)
+
+##### Option 1: Install directly (without tapping)
+
+```bash
+brew install programmablemd/packages/spry-sqlpage
+brew install programmablemd/packages/spry-runbook
+```
+
+##### Option 2: Install from this tap
+
+```bash
+# Add the tap
+brew tap programmablemd/homebrew-packages
+
+# Install spry-runbook and spry-runbook
+brew install spry-sqlpage spry-runbook
+
+# Install spry-sqlpage
+brew install spry-sqlpage
+
+# Install spry-runbook
+brew install spry-runbook
+```
+
+
+### Ubuntu/Debian (.deb packages)
+
+```bash
+# Ubuntu 22.04 (Jammy)
+wget https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-sqlpage_0.80.0-ubuntu22.04u1_amd64.deb
+sudo dpkg -i spry-sqlpage_0.80.0-ubuntu22.04u1_amd64.deb
+
+# Debian 12 (Bookworm)
+wget https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-sqlpage_0.80.0-debian12u1_amd64.deb
+sudo dpkg -i spry-sqlpage_0.80.0-debian12u1_amd64.deb
+```
+
+### macOS (Manual Installation)
+
+If you prefer not to use Homebrew:
+
+```bash
+# Download and extract
+wget https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-sqlpage-macos.tar.gz
+tar -xzf spry-sqlpage-macos.tar.gz
+sudo mv spry-sqlpage-macos /usr/local/bin/spry-sqlpage
+```
+
+### Windows
+
+```powershell
+# Download the Windows packages
+# https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-sqlpage-windows.zip
+# https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-runbook-windows.zip
+
+# Extract the zip files and run:
+.\spry-sqlpage.exe --help
+.\spry-runbook.exe --help
+```
+
+### Direct Download
+
+Visit [GitHub Releases](https://github.com/programmablemd/packages/releases) page to download pre-built binaries for your operating system:
+
+- **Windows**: `spry-sqlpage-windows.zip`, `spry-runbook-windows.zip`
+- **macOS**: `spry-sqlpage-macos.tar.gz`, `spry-runbook-macos.tar.gz`
+- **Linux DEB**: `spry-sqlpage_jammy.deb`, `spry-sqlpage_bookworm.deb`
+
+### Verification
+
+After installation, verify that `spry-sqlpage` and `spry-runbook` are working correctly:
+
+```bash
+spry-sqlpage --version
+spry-sqlpage --help
+
+spry-runbook --version
+spry-runbook --help
+```
+
+
+## Installation By using Deno.
+**Prerequisites:**
 
 Before installing Spry, make sure you have the following installed on your system:
 
 - **Deno:** Spry runs on the Deno runtime (v1.30 or later)
 - **Database:** SQLite or PostgreSQL
 - **SQLPage (optional):** For building web applications
-
-## Installing Deno
+### Installing Deno
 
 Spry is built on Deno, a modern JavaScript/TypeScript runtime. Install it using the following command:
 
@@ -37,7 +127,7 @@ Spry is built on Deno, a modern JavaScript/TypeScript runtime. Install it using 
   After installation, verify Deno is installed correctly by running: `deno --version`
 </Callout>
 
-## Installing Spry
+### Installing Spry
 
 Initialize a new Spry project using the installation script. Choose your preferred database:
 
@@ -81,7 +171,7 @@ Initialize a new Spry project using the installation script. Choose your preferr
   </Tab>
 </Tabs>
 
-## Project Structure
+### Project Structure
 
 After initialization, your project will have the following structure:
 
@@ -95,7 +185,7 @@ myproject/
 └── dev-src.auto/        # Auto-generated SQLPage source files
 ```
 
-## Verify Installation
+### Verify Installation
 
 Test your Spry installation:
 

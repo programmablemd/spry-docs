@@ -3,18 +3,22 @@
   "title": "Core Concepts",
   "icon": "Lightbulb",
   "pages": [
+    "what-is-spry",
     "executable-markdown",
+    "fundamental-building-blocks",
+    "templates-and-partials",
     "task-orchestration",
     "sql-page-integration",
-    "templates-and-partials",
-    "common-workflows",
     "environment-variables",
+    "common-workflows",
     "dag",
     "ast",
     "architecture-deep-drive",
-    "fundamental-building-blocks",
     "plugin-development-guide",
-    "what-is-spry"
+    "axiom-graph-engine",
+    "interpolation",
+    "reflect-module",
+    "universal-module"
   ],
   "root": true
 }

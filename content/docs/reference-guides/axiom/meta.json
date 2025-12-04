@@ -1,5 +1,5 @@
 {
   "title": "Axiom",
   "icon": "Atom",
-  "pages": ["axiom-text-ui", "axiom-web-ui"]
+  "pages": ["spry-axiom-unbook-explorer"]
 }

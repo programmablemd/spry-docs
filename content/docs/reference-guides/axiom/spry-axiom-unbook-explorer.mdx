@@ -13,15 +13,7 @@ import { Steps, Step } from 'fumadocs-ui/components/steps';
 
 The Spry Axiom Explorer CLI is a lightweight, terminal-based interface built on top of the Spry framework to help developers and users interact with markdown docs, ontology graphs, and structured content directly from the command line. The CLI aims to streamline every-day workflows — browsing documentation, inspecting content structure, projecting subsets, or converting markdown into executable scripts — so you can work without leaving your terminal.
 
-Spry is a lightweight TypeScript library that treats Markdown as a programmable medium, where every fence, section, and directive in your .md file can express behavior, not just formatting. The Runbook CLI (accessible via `spry.ts` or `runbook.ts`) is a Spry operator that allows you to execute code cells from markdown documents as tasks in a dependency graph (DAG).
-
-**spry.ts** or **runbook.ts**:
-
-```typescript
-import { CLI } from "../../../lib/axiom/text-ui/runbook.ts";
-
-new CLI().run();
-```
+Spry is a lightweight TypeScript library that treats Markdown as a programmable medium, where every fence, section, and directive in your .md file can express behavior, not just formatting. 
 
 <Callout type="info">
 **What Spry Does:** It executes embedded code blocks, captures their outputs, composes multiple source types (SQL, HTML, JSON, shell, etc.) as executable "cells", and treats sections as first-class programmable units with attributes, metadata, and dependency graphs.

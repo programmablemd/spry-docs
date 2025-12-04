@@ -1,5 +1,6 @@
 {
   "title": "Axiom",
+  "defaultOpen": false,
   "icon": "Atom",
   "pages": ["axiom-text-ui", "axiom-web-ui"]
 }

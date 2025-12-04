@@ -1,11 +1,11 @@
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
-import { Inter } from 'next/font/google';
+//import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
 
-const inter = Inter({
-  subsets: ['latin'],
-});
+// const inter = Inter({
+//   subsets: ['latin'],
+// });
 
 export const metadata: Metadata = {
   title: 'Sprymd Docs',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" className={inter.className} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/favicon.ico" />

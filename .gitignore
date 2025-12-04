@@ -2,6 +2,9 @@
 /node_modules
 
 # generated content
+/.source/
+.source/
+*.source
 .source
 
 # test & build

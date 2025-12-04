@@ -3,6 +3,9 @@
 
 # generated content
 /.source/
+.source/
+*.source
+.source
 
 # test & build
 /coverage

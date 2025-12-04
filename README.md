@@ -88,7 +88,7 @@ fuma-docs-spry/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/vidhyagopinadh/fuma-docs-spry.git
+   git clone https://github.com/programmablemd/spry-docs.git
    cd fuma-docs-spry
    ```
 

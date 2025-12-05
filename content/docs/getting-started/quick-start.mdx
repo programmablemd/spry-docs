@@ -16,7 +16,23 @@ This guide will walk you through creating and deploying your first SQLPage appli
    <Callout>
     Make sure you've completed the <a href="/docs/getting-started/installation#installation-of-executable-package" target="_blank" rel="noopener noreferrer">installation</a> steps before continuing.
     * Go to the project location where you want to create your Spry application.
-    * Create a Spryfile.md file with sqlpage configuration.
+    * Create a Spryfile.md file with sqlpage configuration using the following command.
+    ```bash
+    spry-sqlpage init
+    ```
+    For SQLite and PostgreSQL DB ensure the below content is available in Spryfile.md
+    ```text
+    ---
+    sqlpage-conf:
+      allow_exec: true
+      port: '${env.PORT}'
+      database_url: '${env.SPRY_DB}'
+      web_root: "./dev-src.auto"
+    ---
+    ```    
+    Here, `SPRAY_DB` is an environment variable that holds your database connection string.
+    Specify the database URL and port using environment variables for flexibility.
+        
   </Callout>
   ## Installation using Executable Package: Development Workflow
 
@@ -25,16 +41,7 @@ This guide will walk you through creating and deploying your first SQLPage appli
     <Tabs items={['SQLite', 'PostgreSQL']}>
       <Tab value="SQLite">
         ### SQLite Setup
-        For SQLite DB give the below content in Spryfile.md
-        ``` text
-        ---
-        sqlpage-conf:
-          allow_exec: true
-          port: 9277
-          database_url: "sqlite://spry.sqlite.db?mode=rwc"
-          web_root: "./dev-src.auto"
-        ---
-        ```
+      
         <Steps>
           <Step key="gene-sql">
             ### Generate SQLPage Source Files
@@ -85,15 +92,7 @@ This guide will walk you through creating and deploying your first SQLPage appli
       </Tab>
       <Tab value="PostgreSQL">
         ### PostgreSQL Setup
-        For PostgreSQL DB give the below content in Spryfile.md
-        ``` text
-        ---
-        sqlpage-conf:
-          allow_exec: true
-          database_url: "postgresql://user:password@localhost:5432/mydb"
-          web_root: "./dev-src.auto"
-        ---
-        ```    
+           
         <Steps>
           <Step key="set-db">
             ### Set Database Connection

@@ -11,14 +11,13 @@ import { Steps, Step } from 'fumadocs-ui/components/steps';
 import { Card, Cards } from 'fumadocs-ui/components/card';
 
 This guide will walk you through creating and deploying your first SQLPage application using Spry.
-<Tabs items={['Installation using Executable Package', 'Installation using Deno']}>
-  <Tab value="Installation using Executable Package">
+
    <Callout>
     Make sure you've completed the <a href="/docs/getting-started/installation#installation-of-executable-package" target="_blank" rel="noopener noreferrer">installation</a> steps before continuing.
     * Go to the project location where you want to create your Spry application.
     * Create a Spryfile.md file with sqlpage configuration using the following command.
     ```bash
-    spry-sqlpage init
+    spry sp init
     ```
     For SQLite and PostgreSQL DB ensure the below content is available in Spryfile.md
     ```text
@@ -49,7 +48,7 @@ This guide will walk you through creating and deploying your first SQLPage appli
             Generate the SQLPage source files from your Spryfile.md:
             
             ```bash
-            spry-sqlpage spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
+            spry sp spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
             ```
           </Step>
 
@@ -59,7 +58,7 @@ This guide will walk you through creating and deploying your first SQLPage appli
             Run Spry in watch mode for live reloading:
             
             ```bash
-            spry-sqlpage spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json --watch
+            spry sp spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json --watch
             ```
             
             <Callout type="info" title="Auto-Reload">
@@ -73,7 +72,7 @@ This guide will walk you through creating and deploying your first SQLPage appli
             Deploy SQLPage components to your SQLite database:
             
             ```bash
-            spry-sqlpage task deploy
+            spry rb task deploy
             ```
           </Step>
 
@@ -108,7 +107,7 @@ This guide will walk you through creating and deploying your first SQLPage appli
             ### Generate SQLPage Source Files
             
             ```bash
-            spry-sqlpage spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
+            spry sp spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
             ```
           </Step>
 
@@ -116,7 +115,7 @@ This guide will walk you through creating and deploying your first SQLPage appli
             ### Start Development Server
             
             ```bash
-            spry-sqlpage spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json --watch
+            spry sp spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json --watch
             ```
           </Step>
 
@@ -124,7 +123,7 @@ This guide will walk you through creating and deploying your first SQLPage appli
             ### Deploy to Database
             
             ```bash
-            spry-sqlpage task deploy
+            spry rb task deploy
             ```
           </Step>
 
@@ -138,119 +137,7 @@ This guide will walk you through creating and deploying your first SQLPage appli
         </Steps>
       </Tab>
     </Tabs>    
-  </Tab>
-  <Tab value="Installation using Deno">
-    <Callout>
-      Make sure you've completed the <a href="/docs/getting-started/installation#installation-by-using-deno" target="_blank" rel="noopener noreferrer">installation</a> steps before continuing.
-    </Callout>
-
-    ## Installation using Deno: Development Workflow
-
-    Follow these steps to generate SQLPage assets and start the development server:
-
-    <Tabs items={['SQLite', 'PostgreSQL']}>
-      <Tab value="SQLite">
-        ### SQLite Setup
-        
-        <Steps>
-          <Step key="gene-sql">
-            ### Generate SQLPage Source Files
-            
-            Generate the SQLPage source files from your Spryfile.md:
-            
-            ```bash
-            ./spry.ts spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
-            ```
-          </Step>
-
-          <Step key="start-dev">
-            ### Start Development Server
-            
-            Run Spry in watch mode for live reloading:
-            
-            ```bash
-            ./spry.ts spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json --watch
-            ```
-            
-            <Callout type="info" title="Auto-Reload">
-              The `--watch` flag automatically regenerates files when your Spryfile.md changes!
-            </Callout>
-          </Step>
-
-          <Step key="dep-db">
-            ### Deploy to Database
-            
-            Deploy SQLPage components to your SQLite database:
-            
-            ```bash
-            ./spry.ts task deploy
-            ```
-          </Step>
-
-          <Step key="st-ser">
-            ### Start SQLPage Server
-            
-            Launch the SQLPage server:
-            
-            ```bash
-            SQLPAGE_SITE_PREFIX="" sqlpage
-            ```
-            
-            Your application will be available at `http://localhost:8080`
-          </Step>
-        </Steps>
-      </Tab>
-      
-      <Tab value="PostgreSQL">
-        ### PostgreSQL Setup
-        
-        <Steps>
-          <Step key="set-db">
-            ### Set Database Connection
-            
-            Configure your PostgreSQL connection string:
-            
-            ```bash
-            export DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
-            ```
-          </Step>
-
-          <Step key="gen-sql-page">
-            ### Generate SQLPage Source Files
-            
-            ```bash
-            ./spry.ts spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
-            ```
-          </Step>
-
-          <Step key="start-dev-ser">
-            ### Start Development Server
-            
-            ```bash
-            ./spry.ts spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json --watch
-            ```
-          </Step>
-
-          <Step key="dep-database">
-            ### Deploy to Database
-            
-            ```bash
-            ./spry.ts task deploy
-            ```
-          </Step>
-
-          <Step key="start-sq">
-            ### Start SQLPage Server
-            
-            ```bash
-            SQLPAGE_SITE_PREFIX="" sqlpage
-            ```
-          </Step>
-        </Steps>
-      </Tab>
-    </Tabs>
-  </Tab>
-</Tabs>
+  
 
 ## Your First Spryfile
 

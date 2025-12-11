@@ -2,15 +2,9 @@
   "title": "CLI",
   "defaultOpen": false,
   "pages": [
-    "help",
-    "init",
-    "doctor",
-    "mdast",
-    "spc",
     "sp",
-    "task",
-    "runbook",
-    "qualityfolio-cli",
-    "version"
+    "options",
+    "spry-axiom"
   ]
 }
+

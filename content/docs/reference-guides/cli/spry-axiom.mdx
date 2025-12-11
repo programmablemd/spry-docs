@@ -1,0 +1,428 @@
+---
+title: Axiom 
+description: Spry Axiom Explorer CLI
+icon: Terminal
+index: 5
+tableOfContents:
+  minHeadingLevel: 1
+  maxHeadingLevel: 6
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+
+# Spry Axiom Explorer CLI
+
+The Spry Axiom Explorer CLI is a lightweight, terminal-based interface built on top of the Spry framework to help developers and users interact with markdown docs, ontology graphs, and structured content directly from the command line. The CLI aims to streamline every-day workflows — browsing documentation, inspecting content structure, projecting subsets, or converting markdown into executable scripts — so you can work without leaving your terminal.
+
+Spry is a lightweight TypeScript library that treats Markdown as a programmable medium, where every fence, section, and directive in your .md file can express behavior, not just formatting. 
+
+<Callout type="info">
+**What Spry Does:** It executes embedded code blocks, captures their outputs, composes multiple source types (SQL, HTML, JSON, shell, etc.) as executable "cells", and treats sections as first-class programmable units with attributes, metadata, and dependency graphs.
+</Callout>
+
+## Options
+
+`-h, --help` - Show this help.
+
+**Usage:** 
+
+```bash
+spry axiom [options]
+spry axiom [command] [options]
+```
+
+**Examples for `spry axiom [options]`:**
+
+```bash
+spry axiom -h
+spry axiom --help
+```
+
+**Examples for `spry axiom [command] [options]`:**
+
+```text
+spry axiom web-ui -h
+spry axiom web-ui --help
+spry axiom ls -h
+spry axiom ls --help
+spry axiom inspect -h
+spry axiom inspect --help
+spry axiom projection -h 
+spry axiom projection --help
+spry axiom shebang -h 
+spry axiom shebang --help
+```
+
+## Commands
+
+### web-ui 
+`web-ui [paths...]` - Serve the markdown mdasts and Spry Ontology Graphs (SOGs)
+
+#### web-ui options:
+
+##### web-ui help
+
+**Option:**
+
+`-h, --help` - Show this help.
+
+**Usage:**
+
+```bash
+spry axiom web-ui -h
+```
+
+or
+
+```bash 
+spry axiom web-ui --help 
+```
+
+##### web-ui port
+
+**Option:**
+
+`--port <port>` - port for web server (default 9876)
+
+**Usage:**
+
+To start the Web UI of default Spryfile.md on port 9090, use the command:
+
+```bash
+spry axiom web-ui --port 9090
+```
+
+To start the Web UI of custom md file named runbook-cmd.md on port 9090, use the command:
+
+```bash
+spry axiom web-ui runbook-cmd.md --port 9090 
+```
+
+##### web-ui listen
+
+**Option:**
+
+`--listen <addr>` - address/interface for web serve (default 127.0.0.1)
+
+**Usage:**
+
+To start the Web UI of default Spryfile.md on all interfaces, use the command:
+
+```bash
+spry axiom web-ui --listen 127.0.0.1
+```
+
+To start the Web UI of custom md file named runbook-cmd.md on all interfaces, use the command:
+
+```bash 
+spry axiom web-ui runbook-cmd.md --listen 127.0.0.1
+```
+
+##### web-ui no-open
+
+**Option:**
+
+`--no-open` - when starting server, do not automatically open a browser
+
+**Usage:** 
+
+To start the Web UI of default Spryfile.md without opening a browser, use the command:
+
+```bash 
+spry axiom web-ui --no-open
+```
+
+To start the Web UI of custom md file named runbook-cmd.md without opening a browser, use the command:
+
+```bash 
+spry axiom web-ui runbook-cmd.md --no-open
+```
+  
+### ls 
+`ls [paths...]` - browse containedInSection hierarchy as a tree
+
+**Description:** Serve the markdown mdasts and Spry Ontology Graphs (SOGs)
+
+#### ls options:
+
+##### ls help
+
+**Option:**
+
+`-h, --help` - Show this help.
+
+**Usage:**
+
+```bash
+spry axiom ls -h
+```
+
+or 
+
+```bash
+spry axiom ls --help
+```
+
+##### ls node
+
+**Option:**
+
+`-n, --node <nodeType>` - Additional mdast node.type to include (e.g. paragraph). May be repeated.
+
+**Usage:**
+
+To list all headings and paragraphs in the default Spryfile.md, use the command:
+
+```bash 
+spry axiom ls -n paragraph
+```
+
+or 
+
+```bash
+spry axiom ls --node paragraph
+```
+
+To list all headings and paragraphs in custom md file named runbook-cmd.md, use the command:
+
+```bash
+spry axiom ls runbook-cmd.md -n paragraph
+```
+
+or 
+
+```bash
+spry axiom ls runbook-cmd.md --node paragraph
+```
+
+##### ls no-color
+
+**Option:**
+
+`--no-color` - Show output without ANSI colors
+
+**Usage:**
+
+To list all headings in the default Spryfile.md without colors, use the command:
+
+```bash
+spry axiom ls --no-color
+```
+
+To list all headings in custom md file named runbook-cmd.md without colors, use the command:
+
+```bash
+spry axiom ls runbook-cmd.md --no-color
+```
+
+More example:
+
+```bash
+spry axiom ls -n paragraph --no-color
+```
+
+### inspect
+`inspect [paths...]` - inspect mdast nodes as a hierarchy
+
+spry axiom inspect parses a Markdown file and shows its internal AST (Abstract Syntax Tree) along with all Spry-specific metadata such as:
+
+* Frontmatter (doc-classify, config blocks, parsed FM)
+* Headings and their roles (project, suite, plan, case)
+* Code blocks recognized as tasks (EXECUTABLE, MATERIALIZABLE, import blocks, graphs, descriptions)
+* Command-line metadata extracted from fenced code blocks
+* Structural hierarchy of the document
+
+**Usage:**
+
+```bash 
+spry axiom inspect [options] [paths...]
+```
+
+**Example:**
+
+```bash 
+spry axiom inspect
+```
+
+or 
+
+```bash
+spry axiom inspect <paths>
+```
+
+#### inspect options:
+
+##### inspect help
+
+**Option:**
+
+`-h, --help` - Show this help.
+
+**Usage:**
+
+```bash
+spry axiom inspect -h
+```
+
+or 
+
+```bash
+spry axiom inspect --help
+```
+
+##### inspect no-color
+
+**Option:**
+
+`--no-color` - Show output without ANSI colors
+
+**Usage:**
+
+To inspect mdast nodes in the default Spryfile.md without colors, use the command:
+
+```bash
+spry axiom inspect --no-color
+``` 
+
+To inspect mdast nodes in custom md file named runbook-cmd.md without colors, use the command:
+
+```bash
+spry axiom inspect runbook-cmd.md --no-color
+``` 
+
+### projection
+`projection [paths...]` - compute a projection and emit as JSON (defaults to flexible)
+
+spry axiom projection computes the structured "projection" of a Markdown document — a normalized JSON representation of how Spry interprets the file, including headings, tasks, metadata, imports, graphs, and hierarchical structure.
+
+#### projection options:
+
+##### projection help
+
+**Option:**
+
+`-h, --help` - Show this help.
+
+**Usage:**
+
+```bash
+spry axiom projection -h 
+```
+
+or 
+
+```bash
+spry axiom projection --help
+```
+
+##### projection pretty
+
+**Option:**
+
+`--pretty` - Pretty-print (indent) the JSON (Conflicts: --jsonl)
+
+**Usage:**
+
+Outputs the projection as human-readable, indented JSON.
+
+To compute a projection of the default Spryfile.md and emit as pretty JSON, use the command:
+
+```bash
+spry axiom projection --pretty
+```
+
+To compute a projection of custom md file named runbook-cmd.md and emit as pretty JSON, use the command:
+
+```bash
+spry axiom projection runbook-cmd.md --pretty
+```
+
+##### projection jsonl
+
+**Option:**
+
+`--jsonl` - Independently prepare JSON per file as JSONL (Conflicts: --pretty)
+
+**Usage:**
+
+Produces JSONL (JSON Lines) — one JSON object per file, one line per file.
+
+To compute a projection of the default Spryfile.md and emit as JSONL, use the command:
+
+```bash
+spry axiom projection --jsonl
+``` 
+
+To compute a projection of custom md file named runbook-cmd.md and emit as JSONL, use the command:
+
+```bash
+spry axiom projection runbook-cmd.md --jsonl
+```
+
+### shebang
+`shebang [paths...]` - convert markdown files into executables with shebang (#!) helpers
+
+spry axiom shebang turns a Markdown file into a runnable executable script by inserting a shebang (#!) line at the top.
+
+#### shebang options:
+
+##### shebang help
+
+**Option:**
+
+`-h, --help` - Show this help.
+
+**Usage:**
+
+```bash
+spry axiom shebang -h 
+```
+
+or 
+
+```bash
+spry axiom shebang --help
+```
+
+##### shebang dry-run
+
+**Option:**
+
+`--dry-run` - Emit the shebang line without updating
+
+**Usage:**
+
+To see the shebang line for the default Spryfile.md without modifying the file, use the command:
+
+```bash
+spry axiom shebang --dry-run
+``` 
+
+To see the shebang line for custom md file named runbook-cmd.md without modifying the file, use the command:
+
+```bash
+spry axiom shebang runbook-cmd.md --dry-run
+```
+
+##### shebang entrypoint
+
+**Option:**
+
+`--entrypoint <ep>` - The launcher to use (Default: "./cli.ts")
+
+**Usage:**
+
+Specifies which launcher script should appear in the shebang.
+
+To add a shebang line with a custom entrypoint ./my-spry-launcher.ts to the default Spryfile.md, use the command:
+
+```bash
+spry axiom shebang --entrypoint ./my-spry-launcher.ts
+``` 
+
+To add a shebang line with a custom entrypoint ./my-spry-launcher.ts to custom md file named runbook-cmd.md, use the command:
+
+```bash 
+spry axiom shebang runbook-cmd.md --entrypoint ./my-spry-launcher.ts
+```

@@ -10,6 +10,7 @@ export function baseOptions(): BaseLayoutProps {
           <span>Spry Docs</span>
         </div>
       ),
+      url: 'https://sprymd.org',
     },
   };
 }

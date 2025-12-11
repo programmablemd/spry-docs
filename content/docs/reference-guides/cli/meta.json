@@ -2,6 +2,7 @@
   "title": "CLI",
   "defaultOpen": false,
   "pages": [
+    "sp",
     "options",
     "spry-axiom"
   ]

@@ -7,117 +7,294 @@ index  : 1
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Steps, Step } from 'fumadocs-ui/components/steps';
 
-Installation can be done in two ways. 
-* By using the Execution Package
-* By using Deno.
+## Installation
 
-## Installation of Executable Package
+Spry can be installed via multiple methods depending on your platform and preferences. Choose the method that works best for your workflow.
 
-### Package Managers (Recommended)
+<Tabs items={['Homebrew', 'Binary Download', 'Deno']}>
+  <Tab value="Homebrew">
+    ### Homebrew (Recommended for macOS & Linux)
+    
+    The easiest way to install Spry on macOS or Linux is via Homebrew:
 
-#### Homebrew (macOS & Linux)
+    ```bash
+    # Install via Homebrew
+    brew install programmablemd/packages/spry
+    ```
 
-##### Option 1: Install directly (without tapping)
+    Or add the tap first, then install:
 
-```bash
-brew install programmablemd/packages/spry-sqlpage
-brew install programmablemd/packages/spry-runbook
-```
+    ```bash
+    brew tap programmablemd/homebrew-packages
+    brew install spry
+    ```
 
-##### Option 2: Install from this tap
+    <Callout type="info">
+    Homebrew automatically manages updates and dependencies, making it the recommended installation method for most users.
+    </Callout>
+  </Tab>
 
-```bash
-# Add the tap
-brew tap programmablemd/homebrew-packages
+  <Tab value="Binary Download">
+    ### Direct Binary Download
+    
+    Download pre-built binaries from the [GitHub Releases page](https://github.com/programmablemd/packages/releases):
 
-# Install spry-runbook and spry-runbook
-brew install spry-sqlpage spry-runbook
+    | Platform | Format |
+    |----------|--------|
+    | macOS (Intel & Apple Silicon) | `.tar.gz` |
+    | Ubuntu 22.04 / Debian 12 | `.deb` |
+    | Windows x64 | `.zip` |
 
-# Install spry-sqlpage
-brew install spry-sqlpage
+    #### For Debian-based systems:
 
-# Install spry-runbook
-brew install spry-runbook
-```
+    ```bash
+    # Download and install the .deb package
+    sudo dpkg -i spry_<version>_amd64.deb
 
+    # Ubuntu 22.04 (Jammy)
+    wget https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-sqlpage_0.80.0-ubuntu22.04u1_amd64.deb
+    sudo dpkg -i spry-sqlpage_0.80.0-ubuntu22.04u1_amd64.deb
 
-### Ubuntu/Debian (.deb packages)
+    # Debian 12 (Bookworm)
+    wget https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-sqlpage_0.80.0-debian12u1_amd64.deb
+    sudo dpkg -i spry-sqlpage_0.80.0-debian12u1_amd64.deb
+    ```
 
-```bash
-# Ubuntu 22.04 (Jammy)
-wget https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-sqlpage_0.80.0-ubuntu22.04u1_amd64.deb
-sudo dpkg -i spry-sqlpage_0.80.0-ubuntu22.04u1_amd64.deb
+    #### For macOS (manual installation):
 
-# Debian 12 (Bookworm)
-wget https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-sqlpage_0.80.0-debian12u1_amd64.deb
-sudo dpkg -i spry-sqlpage_0.80.0-debian12u1_amd64.deb
-```
+    ```bash
+    # Extract the archive
+    tar -xzf spry_<version>_darwin_amd64.tar.gz
+    
+    # Move to your PATH
+    sudo mv spry /usr/local/bin/
 
-### macOS (Manual Installation)
+    # Example
+    wget https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-sqlpage-macos.tar.gz
+    tar -xzf spry-sqlpage-macos.tar.gz
+    sudo mv spry-sqlpage-macos /usr/local/bin/spry-sqlpage
+    ```
 
-If you prefer not to use Homebrew:
+    #### For Windows:
 
-```bash
-# Download and extract
-wget https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-sqlpage-macos.tar.gz
-tar -xzf spry-sqlpage-macos.tar.gz
-sudo mv spry-sqlpage-macos /usr/local/bin/spry-sqlpage
-```
+    1. Extract the `.zip` file
+    2. Add the extracted directory to your system PATH
+    3. Restart your terminal
 
-### Windows
+    <Callout type="warning">
+    Manual binary installations won't receive automatic updates. You'll need to download new versions manually.
+    </Callout>
+  </Tab>
 
-```powershell
-# Download the Windows packages
-# https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-sqlpage-windows.zip
-# https://github.com/programmablemd/packages/releases/download/v0.80.0/spry-runbook-windows.zip
+  <Tab value="Deno">
+    ### Run Directly with Deno
+    
+    If you have [Deno 2.5+](https://deno.land) installed, you can run Spry without installation:
 
-# Extract the zip files and run:
-.\spry-sqlpage.exe --help
-.\spry-runbook.exe --help
-```
+    ```bash
+    # Initialize a new Spry project
+    deno run --node-modules-dir=auto -A \
+      https://raw.githubusercontent.com/programmablemd/spry/main/lib/playbook/sqlpage/cli.ts init
+    ```
 
-### Direct Download
+    This approach is useful for:
+    - Quick testing without committing to an installation
+    - CI/CD environments where you want to use specific versions
+    - Containerized deployments
 
-Visit [GitHub Releases](https://github.com/programmablemd/packages/releases) page to download pre-built binaries for your operating system:
-
-- **Windows**: `spry-sqlpage-windows.zip`, `spry-runbook-windows.zip`
-- **macOS**: `spry-sqlpage-macos.tar.gz`, `spry-runbook-macos.tar.gz`
-- **Linux DEB**: `spry-sqlpage_jammy.deb`, `spry-sqlpage_bookworm.deb`
-
-### Verification
-
-After installation, verify that `spry-sqlpage` and `spry-runbook` are working correctly:
-
-```bash
-spry-sqlpage --version
-spry-sqlpage --help
-
-spry-runbook --version
-spry-runbook --help
-```
-
-### Project Structure
-
-After initialization (using `spry sp init`), your project will have the following structure:
-
-```text
-myproject/
-├── Spryfile.md          # Main executable markdown file
-├── spry.ts              # Spry CLI
-├── import_map.json      # Import map To access Spry scripts from a remote folder
-```
+    <Callout>
+    The Deno runtime is required for this method. Install Deno from [deno.land](https://deno.land) if you don't have it already.
+    </Callout>
+  </Tab>
+</Tabs>
 
 ### Verify Installation
 
-Test your Spry installation:
+<Steps>
+  <Step>
+    ### Check Version
+    
+    Confirm Spry is installed correctly by checking the version:
+
+    ```bash
+    spry --version
+    ```
+
+    You should see output like:
+    ```
+    Spry v0.101.x
+    ```
+  </Step>
+
+  <Step>
+    ### View Available Commands
+    
+    Display the help menu to see all available commands:
+
+    ```bash
+    spry --help
+    ```
+
+    This shows the main command groups:
+    - `axiom` - Document structure exploration
+    - `rb` (runbook) - Task execution
+    - `sp` (sqlpage) - SQLPage application management
+  </Step>
+
+  <Step>
+    ### Test Execution
+    
+    Create a simple test file to verify execution works:
+
+    ```bash
+    echo '```bash test
+    echo "Hello from Spry!"
+    ```' > test.md
+    
+    spry rb run test.md
+    ```
+
+    You should see:
+    ```
+    Hello from Spry!
+    ```
+  </Step>
+</Steps>
+
+### System Requirements
+
+#### Minimum Requirements
+
+- **Operating System**: macOS 10.15+, Ubuntu 20.04+, Windows 10+, or equivalent Linux distribution
+- **RAM**: 512 MB minimum, 2 GB recommended
+- **Disk Space**: 50 MB for Spry binary, plus space for your projects
+
+#### Optional Dependencies
+
+Some features require additional tools:
+
+| Tool | Purpose | Installation |
+|------|---------|--------------|
+| **SQLPage** | Run SQLPage web applications | [sqlpage.com](https://sqlpage.com) |
+| **direnv** | Automatic environment variable loading | `brew install direnv` or [direnv.net](https://direnv.net) |
+| **Git** | Version control integration | Pre-installed on most systems |
+
+<Callout type="info">
+**SQLPage for Web Applications**
+
+If you plan to build SQLPage applications, install SQLPage separately:
 
 ```bash
-spry --version
+# macOS/Linux with Homebrew
+brew install sqlpage
+
+# Or download from https://github.com/lovasoa/SQLpage/releases
+```
+</Callout>
+
+### Environment Setup
+
+#### Using direnv (Recommended)
+
+Spry works well with `direnv` for automatic environment variable management:
+
+<Steps>
+  <Step>
+    ### Install direnv
+    
+    ```bash
+    # macOS
+    brew install direnv
+    
+    # Ubuntu/Debian
+    sudo apt-get install direnv
+    ```
+  </Step>
+
+  <Step>
+    ### Configure Your Shell
+    
+    Add to your shell configuration:
+
+    ```bash
+    # For bash (~/.bashrc)
+    eval "$(direnv hook bash)"
+    
+    # For zsh (~/.zshrc)
+    eval "$(direnv hook zsh)"
+    ```
+  </Step>
+
+  <Step>
+    ### Create .envrc File
+    
+    Spry can generate `.envrc` files automatically:
+
+    ```markdown
+    ```envrc prepare-env -C ./.envrc --gitignore
+    export SPRY_DB="sqlite://app.db?mode=rwc"
+    export PORT=9227
+    ```
+    ```
+
+    Then allow direnv to load it:
+    ```bash
+    direnv allow
+    ```
+  </Step>
+</Steps>
+
+#### Manual Environment Setup
+
+If you prefer not to use direnv, you can source environment files manually:
+
+```bash
+# Create environment file
+cat > .env << 'EOF'
+export SPRY_DB="sqlite://app.db?mode=rwc"
+export PORT=9227
+EOF
+
+# Load environment
+source .env
 ```
 
-You should see the Spry version number printed to the console.
+### Installation Troubleshooting
 
-<Callout type="info" title="Next Steps">
-  Now that Spry is installed, head over to the [Quick Start](/docs/getting-started/quick-start) guide to build your first application!
+<Callout type="error">
+**"Command not found: spry"**
+
+The Spry binary is not in your PATH. Try:
+1. Restart your terminal after installation
+2. Check if Homebrew's bin directory is in your PATH: `echo $PATH | grep brew`
+3. Use the full path: `./spry.ts` (when using project-local installation)
 </Callout>
+
+#### Permission Issues
+
+If you encounter permission errors on macOS:
+
+```bash
+# Remove quarantine attribute
+xattr -d com.apple.quarantine /usr/local/bin/spry
+```
+
+#### Updating Spry
+
+<Tabs items={['Homebrew', 'Manual']}>
+  <Tab value="Homebrew">
+    ```bash
+    # Update Homebrew
+    brew update
+    
+    # Upgrade Spry
+    brew upgrade spry
+    ```
+  </Tab>
+
+  <Tab value="Manual">
+    Download the latest release from GitHub and replace your existing installation following the same installation steps.
+  </Tab>
+</Tabs>

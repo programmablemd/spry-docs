@@ -2,9 +2,10 @@
   "title": "CLI",
   "defaultOpen": false,
   "pages": [
-    "sp",
     "options",
-    "spry-axiom"
+    "spry-axiom",
+    "rb",
+    "sp"
   ]
 }
 

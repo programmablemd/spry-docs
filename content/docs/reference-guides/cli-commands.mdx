@@ -91,42 +91,30 @@ SQLPage Content generation and management:
 
 #### Package Generation
 
-- [`spry sp spc --package`](.cli/sp#sp-spc---sqlpage-content-cli) - Generate SQL package for SQLite
-- [`spry sp spc --package --dialect postgres`](.cli/sp#sp-spc---sqlpage-content-cli) - Generate SQL package for PostgreSQL
+- [`spry sp spc --package`](./cli/sp#package-generation) - Generate SQL package for SQLite
+- [`spry sp spc --package --dialect postgres`](./cli/sp#package-generation) - Generate SQL package for PostgreSQL
 
 #### File Materialization
 
-- [`spry sp spc --fs dev-src.auto`](.cli/sp#sp-spc---sqlpage-content-cli) - Materialize files to directory
-- [`spry sp spc --fs dev-src.auto --conf sqlpage/sqlpage.json`](.cli/sp#sp-spc---sqlpage-content-cli) - Materialize files with config file
-- [`spry sp spc --fs dev-src.auto --destroy-first`](.cli/sp#sp-spc---sqlpage-content-cli) - Clean build (remove existing files first)
+- [`spry sp spc --fs dev-src.auto --conf sqlpage/sqlpage.json`](./cli/sp#file-materialization) - Materialize files with config file
+- [`spry sp spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json`](./cli/sp#file-materialization) - Clean build (remove existing files first)
 
 #### Development Mode
 
-- [`spry sp spc --fs dev-src.auto --watch`](.cli/sp#sp-spc---sqlpage-content-cli) - Watch mode with auto-rebuild
-- [`spry sp spc --fs dev-src.auto --destroy-first --watch --with-sqlpage`](.cli/sp#sp-spc---sqlpage-content-cli) - Watch mode with SQLPage server
-- [`spry sp spc --fs dev-src.auto --watch --with-sqlpage --sqlpage-bin /usr/local/bin/sqlpage`](.cli/sp#sp-spc---sqlpage-content-cli) - Watch mode with custom SQLPage binary
+- [`spry sp spc --fs dev-src.auto --conf sqlpage/sqlpage.json --watch`](./cli/sp#file-materialization) - Watch mode with auto-rebuild
+- [`spry sp spc --fs dev-src.auto --conf sqlpage/sqlpage.json --destroy-first --watch --with-sqlpage`](./cli/sp#file-materialization) - Watch mode with SQLPage server
+- [`spry sp spc --fs dev-src.auto --conf sqlpage/sqlpage.json --watch --with-sqlpage --sqlpage-bin /usr/local/bin/sqlpage`](./cli/sp#file-materialization) - Watch mode with custom SQLPage binary
 
 #### Database Deployment
 
-- [`spry sp spc --package | sqlite3 app.db`](./cli/sp#sp-spc---sqlpage-content-cli) - Deploy to SQLite database
-- [`spry sp spc --package --dialect postgres | psql $DATABASE_URL`](./cli/sp#sp-spc---sqlpage-content-cli) - Deploy to PostgreSQL
-- [`spry sp spc --package --dialect postgres | psql postgresql://user:pass@host:5432/db`](./cli/sp#sp-spc---sqlpage-content-cli) - Deploy to remote PostgreSQL
+- [`spry sp spc --package | sqlite3 app.db`](./cli/sp#database-deployment) - Deploy to SQLite database
+- [`spry sp spc --package --dialect postgres | psql $DATABASE_URL`](./cli/sp#database-deployment) - Deploy to PostgreSQL
+- [`spry sp spc --package --dialect postgres | psql postgresql://user:pass@host:5432/db`](./cli/sp#database-deployment) - Deploy to remote PostgreSQL
 
 #### File Operations
 
-- [`spry sp spc ls`](./cli/sp#sp-spc---sqlpage-content-cli) - List SQLPage files
-- [`spry sp spc cat -g "*.sql"`](.cli/sp#sp-spc---sqlpage-content-cli) - Show file contents matching glob pattern
-
-### Task Commands
-
-Task execution and management:
-
-#### Execute Tasks
-
-- [`spry rb task prepare-db`](./cli/task) - Execute prepare-db task
-- [`spry rb task deploy --summarize --verbose rich`](./cli/task#examples) - Execute deploy task with summary and verbose output
-- [`spry rb task build --verbose rich`](./cli/task#viewing-capturable-tasks) - Execute build task with verbose output
-
+- [`spry sp spc ls`](./cli/sp#sp-spc-ls---list-sqlpage-files) - List SQLPage files
+- [`spry sp spc cat -g "*.sql"`](./cli/sp#sp-spc-cat---concatenate-file-contents) - Show file contents matching glob pattern
 
 
 ## Command Structure

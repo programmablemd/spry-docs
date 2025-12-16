@@ -5,7 +5,8 @@
     "contributing-to-spry",
     "spry-help",
     "code-contributor-guide",
-    "spry-start"
+    "spry-start",
+    "api-doc"
   ],
   "root": true
 }

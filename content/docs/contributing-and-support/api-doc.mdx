@@ -1,0 +1,341 @@
+---
+title: API Reference
+description: Programmatic API reference for using Spry as a library
+icon: Code
+toc: true
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+import { Tabs, Tab } from "fumadocs-ui/components/tabs";
+
+# API Reference
+
+Programmatic API reference for using **Spry** as a TypeScript / JavaScript library.
+
+Spry exposes a set of composable APIs for:
+
+- Parsing Markdown into ASTs
+- Building semantic graphs
+- Projecting graphs into executable models
+- Executing tasks with dependency resolution
+- Observing execution via event buses
+
+---
+
+## Overview
+
+Spry can be embedded in TypeScript/JavaScript applications using its core APIs.
+```ts
+// Core imports
+import { markdownASTs } from "./lib/axiom/io/mod.ts";
+import { graph } from "./lib/axiom/graph.ts";
+import { executionPlan } from "./lib/universal/task.ts";
+import { playbooksFromFiles } from "./lib/axiom/projection/playbook.ts";
+```
+<Callout type="info"> All APIs are designed to be <strong>stream-friendly</strong> and work well with large document sets and remote resources. </Callout>
+
+---
+
+## markdownASTs
+
+Parse Markdown sources into **MDAST (Markdown AST)** representations.
+
+### Signature
+
+```ts
+async function* markdownASTs<P, S>(
+  provenances: readonly string[] | Iterable<P> | AsyncIterable<P>,
+  options?: MarkdownASTsOptions<P, S>
+): AsyncGenerator<MarkdownEncountered>
+```
+
+### Usage
+
+```ts
+import { markdownASTs } from "./lib/axiom/io/mod.ts";
+
+// Single file
+for await (const md of markdownASTs(["./Spryfile.md"])) {
+  console.log(md.file.path);
+  console.log(md.mdastRoot);
+}
+
+// Multiple files
+for await (const md of markdownASTs(["./doc1.md", "./doc2.md"])) {
+  // process documents
+}
+
+// Remote files
+for await (const md of markdownASTs(["https://example.com/doc.md"])) {
+  // process remote markdown
+}
+```
+
+### Yielded Value
+
+Each yielded item contains:
+
+| Property      | Type            | Description              |
+| ------------- | --------------- | ------------------------ |
+| `resource`    | `VFileResource` | Source resource          |
+| `file`        | `VFile`         | Virtual file             |
+| `mdastRoot`   | `Root`          | Parsed AST               |
+| `nodeSrcText` | `object`        | Node source helpers      |
+| `mdSrcText`   | `string`        | Raw markdown             |
+| `fileRef`     | `function`      | File reference formatter |
+| `relativeTo`  | `function`      | Path resolver            |
+
+### Options
+
+```ts
+interface MarkdownASTsOptions<P, S> {
+  pipeline?: ReturnType<typeof mardownParserPipeline>;
+  factory?: ReturnType<typeof vfileResourcesFactory<P, S>>;
+}
+```
+
+---
+
+## Graph API
+
+Build semantic graphs from parsed Markdown ASTs.
+
+### graph()
+
+```ts
+import { graph } from "./lib/axiom/graph.ts";
+
+for await (const md of markdownASTs(["./doc.md"])) {
+  const g = graph(md.mdastRoot);
+
+  console.log(g.rels);
+  console.log(g.relCounts);
+  console.log(g.edges);
+}
+```
+
+### Return Type
+
+```ts
+interface Graph<Relationship, Edge> {
+  root: Root;
+  edges: readonly Edge[];
+  rels: Set<string>;
+  relCounts: Record<string, number>;
+}
+```
+
+### graphToDot()
+
+Export graphs in **Graphviz DOT** format.
+
+```ts
+import { graphToDot } from "./lib/axiom/graph.ts";
+
+const dot = graphToDot(g, { graphName: "MyGraph" });
+await Deno.writeTextFile("graph.dot", dot);
+```
+
+---
+
+## Projection APIs
+
+Transform graphs into domain-specific models.
+
+### flexibleProjectionFromFiles()
+
+```ts
+import { flexibleProjectionFromFiles } from "./lib/axiom/projection/flexible.ts";
+
+const model = await flexibleProjectionFromFiles(["./doc.md"]);
+
+console.log(model.documents);
+console.log(model.nodes);
+console.log(model.hierarchies);
+```
+
+### playbooksFromFiles()
+
+Create executable playbooks from Markdown.
+
+```ts
+import { playbooksFromFiles } from "./lib/axiom/projection/playbook.ts";
+
+const { tasks, directives, issues, sources } =
+  await playbooksFromFiles(["./Spryfile.md"]);
+
+console.log(tasks.map(t => t.taskId()));
+console.log(issues);
+```
+
+### PlaybookProjection
+
+```ts
+interface PlaybookProjection {
+  sources: MarkdownEncountered[];
+  executablesById: Record<string, Executable>;
+  executables: Executable[];
+  materializablesById: Record<string, Materializable>;
+  materializables: Materializable[];
+  directivesById: Record<string, Directive>;
+  directives: Directive[];
+  tasks: ExecutableTask[];
+  issues: NodeIssue[];
+}
+```
+
+---
+
+## Task Execution
+
+Execute tasks while respecting dependencies.
+
+### executionPlan()
+
+```ts
+import { executionPlan } from "./lib/universal/task.ts";
+
+const plan = executionPlan(tasks);
+
+console.log(plan.ids);
+console.log(plan.layers);
+console.log(plan.dag.map(t => t.taskId()));
+```
+
+### TaskExecutionPlan
+
+```ts
+interface TaskExecutionPlan<T extends Task> {
+  tasks: readonly T[];
+  ids: readonly string[];
+  byId: Readonly<Record<string, T>>;
+  missingDeps: Readonly<Record<string, string[]>>;
+  adjacency: Readonly<Record<string, string[]>>;
+  indegree: Readonly<Record<string, number>>;
+  edges: readonly [string, string][];
+  layers: readonly string[][];
+  dag: readonly T[];
+  unresolved: readonly string[];
+}
+```
+
+### executionSubplan()
+
+```ts
+import { executionSubplan } from "./lib/universal/task.ts";
+
+const full = executionPlan(tasks);
+const sub = executionSubplan(full, ["deploy"]);
+```
+
+### executeDAG()
+
+```ts
+import { executeDAG } from "./lib/universal/task.ts";
+
+const summary = await executeDAG(plan, async (task) => {
+  const result = await runTask(task);
+  return {
+    disposition: result.success ? "continue" : "terminate",
+    success: result.success,
+    exitCode: result.exitCode,
+    startedAt: result.startedAt,
+    endedAt: result.endedAt,
+  };
+});
+```
+
+---
+
+## Event Bus
+
+Observe execution using typed events.
+
+### Creating an Event Bus
+
+```ts
+import { eventBus } from "./lib/universal/event-bus.ts";
+
+interface MyEvents {
+  "task:start": { taskId: string };
+  "task:done": { taskId: string; success: boolean };
+  "task:error": { taskId: string; error: Error };
+}
+
+const bus = eventBus<MyEvents>();
+```
+
+### Subscribing to Events
+
+```ts
+bus.on("task:start", e => console.log("Start", e.taskId));
+bus.on("task:done", e => console.log("Done", e.taskId));
+bus.on("task:error", e => console.error(e.error));
+```
+
+---
+
+## Complete Example
+
+```ts
+// spry-runner.ts
+import { markdownASTs } from "./lib/axiom/io/mod.ts";
+import { graph } from "./lib/axiom/graph.ts";
+import { playbooksFromFiles } from "./lib/axiom/projection/playbook.ts";
+import { executionPlan, executionSubplan } from "./lib/universal/task.ts";
+import { tasksRunbook } from "./lib/axiom/orchestrate/task.ts";
+
+export class SpryRunner {
+  constructor(private paths: string[]) {}
+
+  async listTasks() {
+    const { tasks } = await playbooksFromFiles(this.paths);
+    return tasks.map(t => ({
+      id: t.taskId(),
+      deps: t.taskDeps(),
+    }));
+  }
+
+  async execute() {
+    const { tasks, directives } = await playbooksFromFiles(this.paths);
+    const plan = executionPlan(tasks);
+    return tasksRunbook({ directives }).execute(plan);
+  }
+
+  async executeTask(taskId: string) {
+    const { tasks, directives } = await playbooksFromFiles(this.paths);
+    const plan = executionSubplan(executionPlan(tasks), [taskId]);
+    return tasksRunbook({ directives }).execute(plan);
+  }
+}
+```
+
+---
+
+## Import Locations
+
+```ts
+// Parsing
+import { markdownASTs, mardownParserPipeline } from "./lib/axiom/io/mod.ts";
+
+// Graphs
+import { graph, graphToDot } from "./lib/axiom/graph.ts";
+
+// Projections
+import { flexibleProjectionFromFiles } from "./lib/axiom/projection/flexible.ts";
+import { playbooksFromFiles } from "./lib/axiom/projection/playbook.ts";
+
+// Execution
+import { executionPlan, executeDAG, executionSubplan } from "./lib/universal/task.ts";
+import { tasksRunbook } from "./lib/axiom/orchestrate/task.ts";
+
+// Events
+import { eventBus } from "./lib/universal/event-bus.ts";
+```
+
+---
+
+<Callout type="success">
+This API surface is intentionally modular — you can use only parsing, only graphing,
+or the full execution pipeline depending on your use case.
+</Callout>

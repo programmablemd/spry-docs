@@ -4,7 +4,13 @@
   "pages": [
     "contributing-to-spry",
     "spry-help",
-    "code-contributor-guide"
+    "code-contributor-guide",
+    "architecture-deep-drive",
+    "plugin-development-guide",
+    "axiom-graph-engine",
+    "interpolation",
+    "reflect-module",
+    "universal-module"
   ],
   "root": true
 }

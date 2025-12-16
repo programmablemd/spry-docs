@@ -1,0 +1,655 @@
+---
+title: Architecture Deep Dive
+description: Programmable Markdown Document Model
+icon: Layers
+index: 4
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { Steps, Step } from 'fumadocs-ui/components/steps';
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+## System Overview
+
+Spry transforms Markdown into executable workflows through a multi-stage pipeline. Understanding this architecture helps you leverage Spry's full capabilities and extend it for your needs.
+
+<Callout type="info">
+**Pipeline Philosophy**
+
+Spry's design separates concerns into four distinct phases: **Parse**, **Analyze**, **Project**, and **Execute**. Each phase builds upon the previous one, creating a flexible and extensible system.
+</Callout>
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     SPRY EXECUTION PIPELINE                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. PARSE                                                        │
+│     ┌──────────┐    ┌─────────────┐    ┌─────────────┐          │
+│     │ Markdown │ ──▶│ remark      │ ──▶│ mdast       │          │
+│     │ (.md)    │    │ + plugins   │    │ (AST)       │          │
+│     └──────────┘    └─────────────┘    └─────────────┘          │
+│                                                                  │
+│  2. ANALYZE (Axiom)                                              │
+│     ┌─────────────┐    ┌─────────────┐    ┌─────────────┐       │
+│     │ mdast       │ ──▶│ Edge Rules  │ ──▶│ Graph       │       │
+│     │ (AST)       │    │ Pipeline    │    │ (Nodes+     │       │
+│     │             │    │             │    │  Edges)     │       │
+│     └─────────────┘    └─────────────┘    └─────────────┘       │
+│                                                                  │
+│  3. PROJECT                                                      │
+│     ┌─────────────┐    ┌─────────────┐    ┌─────────────┐       │
+│     │ Graph       │ ──▶│ Projection  │ ──▶│ Domain      │       │
+│     │             │    │ (Flexible,  │    │ Model       │       │
+│     │             │    │  Playbook)  │    │             │       │
+│     └─────────────┘    └─────────────┘    └─────────────┘       │
+│                                                                  │
+│  4. EXECUTE / EMIT                                               │
+│     ┌─────────────┐    ┌─────────────┐    ┌─────────────┐       │
+│     │ Domain      │ ──▶│ Task DAG    │ ──▶│ Artifacts   │       │
+│     │ Model       │    │ Executor    │    │ (SQL, HTML, │       │
+│     │             │    │             │    │  Output)    │       │
+│     └─────────────┘    └─────────────┘    └─────────────┘       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Phase 1: Parse
+
+The parsing phase converts Markdown text into an Abstract Syntax Tree (AST) using the unified/remark ecosystem.
+
+### Location
+
+`lib/axiom/io/mod.ts`
+
+### Components
+
+```typescript
+import { mardownParserPipeline } from "./lib/axiom/io/mod.ts";
+
+const pipeline = mardownParserPipeline();
+// Uses unified() with a series of plugins
+```
+
+### Plugin Pipeline
+
+The parser runs a carefully ordered sequence of plugins, each building on the previous:
+
+| Order | Plugin | Purpose |
+|-------|--------|---------|
+| 1 | `remarkParse` | Parse Markdown to mdast |
+| 2 | `remarkFrontmatter` | Extract YAML frontmatter |
+| 3 | `remarkDirective` | Parse `:x`, `::x`, `:::x` directives |
+| 4 | `docFrontmatter` | Parse and store document YAML |
+| 5 | `remarkGfm` | GitHub Flavored Markdown |
+| 6 | `resolveImportSpecs` | Find importable code blocks |
+| 7 | `insertImportPlaceholders` | Generate imported cells |
+| 8 | `nodeDecorator` | Transform @id to decorators |
+| 9 | `codeDirectiveCandidates` | Identify code directives |
+| 10 | `actionableCodeCandidates` | Mark executable blocks |
+
+<Callout>
+**Plugin Order Matters**
+
+Plugins execute in sequence, with each building on the AST transformations of previous plugins. For example, `nodeDecorator` must run before `actionableCodeCandidates` to properly identify executable cells.
+</Callout>
+
+### Output
+
+An mdast `Root` node with enhanced `data` properties on relevant nodes, ready for semantic analysis.
+
+## Phase 2: Analyze (Axiom)
+
+Axiom applies edge rules to build a semantic graph representing the relationships between elements in your Spryfile.
+
+### Location
+
+`lib/axiom/edge/`
+
+### Edge Rules
+
+Rules are functions that process the AST and yield relationship edges:
+
+```typescript
+type GraphEdgesRule<Rel, Ctx, Edge> = (
+  ctx: Ctx,
+  prevEdges: Iterable<Edge>
+) => Iterable<Edge> | false;
+```
+
+### Core Rules
+
+| Rule | Relationship | Purpose |
+|------|--------------|---------|
+| `containedInSection` | `containedInSection` | Section hierarchy |
+| `parentHeading` | `parentHeading` | Heading relationships |
+| `sectionSemanticId` | `sectionHasSemanticId` | @id decorators |
+| `frontmatterClassification` | `hasFrontmatter` | Document frontmatter |
+| `nodeDependency` | `dependsOn` | Task dependencies |
+
+<Callout type="info">
+**Rule Composition**
+
+Rules can be composed and extended without modifying existing code. This makes it easy to add custom semantic relationships for domain-specific use cases.
+</Callout>
+
+### Rule Execution
+
+```typescript
+function* astGraphEdges(root, { prepareContext, rules }) {
+  const ctx = prepareContext(root);
+
+  let current = [];
+  for (const rule of rules(ctx)) {
+    const produced = rule(ctx, current);
+    if (produced !== false) {
+      current = produced;
+    }
+  }
+
+  for (const edge of current) {
+    yield edge;
+  }
+}
+```
+
+### Output
+
+A `Graph` object containing:
+
+- **`root`** - The mdast Root node
+- **`edges`** - Array of relationship edges
+- **`rels`** - Set of relationship types
+- **`relCounts`** - Count per relationship type
+
+## Phase 3: Project
+
+Projections transform the semantic graph into domain-specific models optimized for different use cases.
+
+### Location
+
+`lib/axiom/projection/`
+
+### Available Projections
+
+<Tabs items={['Flexible', 'Playbook']}>
+  <Tab value="Flexible">
+    #### FlexibleProjection
+
+    Provides a relational view of the document structure:
+
+    ```typescript
+    const model = await flexibleProjectionFromFiles(paths);
+
+    // Returns:
+    {
+      documents: [...],      // Document metadata
+      nodes: {...},          // Node lookup by ID
+      hierarchies: {...},    // Section tree structures
+      mdastStore: [...],     // AST node storage
+    }
+    ```
+
+    **Use Cases:**
+    - Document analysis and querying
+    - Building custom tooling
+    - Exploring document structure
+    - Creating visualizations
+  </Tab>
+
+  <Tab value="Playbook">
+    #### PlaybookProjection
+
+    Creates an executable task model for runbook operations:
+
+    ```typescript
+    const { tasks, directives, issues } = await playbooksFromFiles(paths);
+
+    // Returns:
+    {
+      sources: [...],           // Source documents
+      executables: [...],       // Executable cells
+      materializables: [...],   // Materializable cells
+      directives: [...],        // Directive cells
+      tasks: [...],             // ExecutableTask objects
+      issues: [...],            // Validation issues
+    }
+    ```
+
+    **Use Cases:**
+    - Running automated workflows
+    - Executing multi-step processes
+    - Building CI/CD pipelines
+    - Creating interactive runbooks
+  </Tab>
+</Tabs>
+
+### Task Classification
+
+Tasks are categorized by their nature and intended use:
+
+| Nature | Purpose | Examples |
+|--------|---------|----------|
+| **EXECUTABLE** | Run and capture output | `bash`, `deno`, `python` |
+| **MATERIALIZABLE** | Emit as files | `sql`, `html`, `json` |
+| **DIRECTIVE** | Control behavior | `PARTIAL`, `HEAD`, `TAIL` |
+
+<Callout>
+**Extensible Classification**
+
+The task classification system is extensible. You can define custom natures and executors for domain-specific languages or tools.
+</Callout>
+
+## Phase 4: Execute / Emit
+
+The final phase executes tasks or emits artifacts using a DAG-based execution engine.
+
+### Location
+
+`lib/universal/task.ts`, `lib/axiom/orchestrate/task.ts`
+
+### Execution Plan
+
+```typescript
+const plan = executionPlan(tasks);
+
+// Plan includes:
+{
+  ids: [...],         // Task identifiers
+  byId: {...},        // Quick lookup map
+  layers: [...],      // Parallel execution waves
+  dag: [...],         // Topological order
+  edges: [...],       // Dependency edges
+  unresolved: [...],  // Cycle detection
+}
+```
+
+<Callout type="warning">
+**Dependency Resolution**
+
+The execution planner uses Kahn's algorithm for topological sorting. Circular dependencies are detected and reported as errors before execution begins.
+</Callout>
+
+### DAG Execution
+
+The task executor uses Kahn's algorithm for dependency resolution:
+
+<Steps>
+  <Step>
+    **Find Root Tasks**
+    
+    Identify all tasks with no unmet dependencies (indegree = 0).
+  </Step>
+
+  <Step>
+    **Execute Available Tasks**
+    
+    Run all tasks in the current layer (optionally in parallel).
+  </Step>
+
+  <Step>
+    **Update Dependencies**
+    
+    Mark completed tasks as done and reduce the indegree of dependent tasks.
+  </Step>
+
+  <Step>
+    **Repeat or Complete**
+    
+    Continue until all tasks are complete or a cycle is detected.
+  </Step>
+</Steps>
+
+### Task Runner
+
+```typescript
+const runbook = tasksRunbook({ directives, shellBus, tasksBus });
+const results = await runbook.execute(plan);
+```
+
+**Execution Features:**
+- Event-driven progress reporting
+- Streaming output capture
+- Error handling and recovery
+- Parallel execution support (via layers)
+
+## Library Structure
+
+Understanding Spry's module organization helps you navigate the codebase and extend functionality.
+
+### lib/axiom
+
+The semantic graph engine and core transformation pipeline.
+
+```
+lib/axiom/
+├── mod.ts              # Public exports
+├── graph.ts            # Graph building
+├── edge/               # Edge rules
+│   ├── mod.ts
+│   ├── orchestrate.ts  # Rule pipeline
+│   ├── rule/           # Individual rules
+│   └── pipeline/       # Rule compositions
+├── io/                 # I/O and parsing
+│   ├── mod.ts
+│   └── resource.ts
+├── mdast/              # AST utilities
+│   ├── data-bag.ts
+│   ├── node-issues.ts
+│   └── ...
+├── projection/         # Graph projections
+│   ├── flexible.ts
+│   ├── playbook.ts
+│   └── tree.ts
+├── remark/             # Remark plugins
+│   ├── actionable-code-candidates.ts
+│   ├── code-directive-candidates.ts
+│   └── ...
+├── text-ui/            # Terminal interfaces
+└── web-ui/             # Web interface
+```
+
+### lib/universal
+
+Shared utilities used across the system.
+
+```
+lib/universal/
+├── task.ts             # DAG execution
+├── shell.ts            # Shell commands
+├── resource.ts         # Resource loading
+├── code.ts             # Code parsing
+├── directive.ts        # Directive parsing
+├── event-bus.ts        # Event system
+├── watcher.ts          # File watching
+└── ...
+```
+
+### lib/courier
+
+Data movement protocol implementations.
+
+```
+lib/courier/
+├── protocol.ts         # DataMP protocol
+├── singer.ts           # Singer adapter
+└── airbyte.ts          # Airbyte adapter
+```
+
+### lib/playbook
+
+Domain-specific playbook implementations.
+
+```
+lib/playbook/
+├── README.md           # Architecture docs
+└── sqlpage/
+    ├── cli.ts          # SQLPage CLI
+    ├── content.ts      # Content generation
+    ├── interpolate.ts  # Template interpolation
+    └── orchestrate.ts  # Orchestration
+```
+
+## Data Flow Examples
+
+Understanding data flow through the pipeline helps you debug issues and optimize workflows.
+
+### Markdown to Tasks
+
+```
+Spryfile.md
+    │
+    ▼
+markdownASTs()
+    │
+    ▼
+mdast Root + VFile
+    │
+    ▼
+graph()
+    │
+    ▼
+Graph { edges, nodes }
+    │
+    ▼
+playbooksFromFiles()
+    │
+    ▼
+PlaybookProjection { tasks, directives }
+    │
+    ▼
+executionPlan()
+    │
+    ▼
+TaskExecutionPlan { layers, dag }
+    │
+    ▼
+tasksRunbook().execute()
+    │
+    ▼
+ExecutionResults
+```
+
+### Markdown to SQLPage
+
+```
+Spryfile.md
+    │
+    ▼
+sqlPagePlaybook()
+    │
+    ▼
+SqlPagePlaybookProjection
+    │
+    ▼
+sqlPageFiles()
+    │
+    ▼
+SqlPageContent[]
+    │
+    ├──▶ materializeFs() ──▶ dev-src.auto/*.sql
+    │
+    └──▶ sqlPageFilesUpsertDML() ──▶ SQL INSERT statements
+```
+
+<Callout type="info">
+**Multiple Output Paths**
+
+The SQLPage flow demonstrates how Spry can emit artifacts in multiple formats from a single source - both as filesystem files for development and as database records for production deployment.
+</Callout>
+
+## Design Principles
+
+Spry's architecture embodies several key design principles that guide development and usage.
+
+<Cards>
+  <Card title="Determinism" icon="CheckCircle">
+    Same input always produces the same output through stable sorting and reproducible graph generation
+  </Card>
+  
+  <Card title="Composability" icon="Boxes">
+    Components mix freely - projections stack, rules extend, and playbooks share infrastructure
+  </Card>
+  
+  <Card title="Type Safety" icon="Shield">
+    TypeScript throughout with Zod schemas for validation and runtime type checking
+  </Card>
+  
+  <Card title="Extensibility" icon="Puzzle">
+    Plugin architecture enables custom remark plugins, edge rules, projections, and executors
+  </Card>
+</Cards>
+
+### Determinism
+
+Same input always produces same output:
+
+- **Stable topological ordering** - Tasks execute in a predictable sequence
+- **Definition-order tie-breaking** - When multiple orders are valid, uses document order
+- **Reproducible graph generation** - AST transformations are pure functions
+
+### Composability
+
+Components mix freely without tight coupling:
+
+- **Projections stack** - Multiple views of the same graph
+- **Rules extend** - Add new relationships without modifying existing ones
+- **Playbooks share infrastructure** - Reuse executors and utilities
+
+### Type Safety
+
+TypeScript provides strong guarantees:
+
+- **Zod schemas** - Runtime validation of configurations and data
+- **Generic types** - Flexible while maintaining type safety
+- **Runtime checking** - Catch errors before they cause problems
+
+### Extensibility
+
+Plugin architecture throughout:
+
+- **Custom remark plugins** - Transform Markdown in new ways
+- **Custom edge rules** - Define new semantic relationships
+- **Custom projections** - Create domain-specific models
+- **Custom executors** - Support new languages and tools
+
+## Performance Considerations
+
+Understanding performance characteristics helps you build efficient workflows.
+
+### Planning
+
+- **O(V + E) complexity** - Linear in vertices and edges
+- **Stable sorting** - Limited to frontier nodes only
+- **Non-destructive indegree** - Preserves original graph structure
+
+### Execution
+
+- **Serial by default** - Predictable and debuggable
+- **Parallelization available** - Via execution layers when safe
+- **Event-driven reporting** - Non-blocking progress updates
+- **Streaming output** - Memory-efficient capture of large outputs
+
+### Memory
+
+- **AST nodes shared** - Not copied, reducing memory footprint
+- **Lazy iteration** - Process data on-demand where possible
+- **VFile-based resources** - Efficient file handling
+
+<Callout type="warning">
+**Large Workflows**
+
+For workflows with hundreds of tasks, consider breaking them into smaller Spryfiles that can be composed together. This improves both performance and maintainability.
+</Callout>
+
+## Extending Spry
+
+Spry's architecture makes it straightforward to add new capabilities.
+
+### Adding a Custom Language
+
+<Steps>
+  <Step>
+    **Define the Language Nature**
+    
+    Determine if it's EXECUTABLE, MATERIALIZABLE, or DIRECTIVE:
+    
+    ```typescript
+    const myLang = {
+      nature: "EXECUTABLE" as const,
+      lang: "mylang",
+      extensions: [".mylang"]
+    };
+    ```
+  </Step>
+
+  <Step>
+    **Create an Executor**
+    
+    Implement the execution logic:
+    
+    ```typescript
+    async function executeMyLang(cell: CodeCell, context: ExecutionContext) {
+      // Your execution logic here
+      const result = await runMyLanguage(cell.code);
+      return { stdout: result, stderr: "", exitCode: 0 };
+    }
+    ```
+  </Step>
+
+  <Step>
+    **Register the Language**
+    
+    Add it to the language registry:
+    
+    ```typescript
+    languageRegistry.register(myLang, executeMyLang);
+    ```
+  </Step>
+</Steps>
+
+### Adding a Custom Projection
+
+```typescript
+export function myCustomProjection(graph: Graph): MyDomainModel {
+  // Extract relevant nodes and edges
+  const relevantNodes = Array.from(graph.nodes())
+    .filter(node => /* your criteria */);
+
+  // Build your domain model
+  return {
+    // Your custom structure
+  };
+}
+```
+
+### Adding a Custom Edge Rule
+
+```typescript
+export function* myCustomRule(
+  ctx: GraphContext,
+  prevEdges: Iterable<Edge>
+): Iterable<Edge> {
+  // Analyze the AST
+  const nodes = selectNodes(ctx.root);
+  
+  // Yield new edges
+  for (const node of nodes) {
+    yield {
+      source: node.id,
+      target: relatedNode.id,
+      relationship: "myRelationship"
+    };
+  }
+  
+  // Pass through previous edges
+  yield* prevEdges;
+}
+```
+
+## Next Steps
+
+<Cards>
+  <Card title="Build Your First Project" href="/docs/getting-started/first-project">
+    Apply this architecture knowledge to build a real application
+  </Card>
+  
+  <Card title="Explore Code Cells" href="/docs/core-concepts/code-cells">
+    Learn how different cell types are processed
+  </Card>
+  
+  <Card title="Task Dependencies" href="/docs/core-concepts/task-dependencies">
+    Master the DAG execution system
+  </Card>
+  
+  <Card title="Contributing Guide" href="/docs/contributing">
+    Extend Spry with your own features
+  </Card>
+</Cards>
+
+<Callout type="success">
+**Understanding Enables Mastery**
+
+With this architectural knowledge, you can leverage Spry's full power, debug complex issues, and extend it for your unique needs.
+</Callout>

@@ -5,6 +5,12 @@
     "contributing-to-spry",
     "spry-help",
     "code-contributor-guide",
+    "architecture-deep-drive",
+    "plugin-development-guide",
+    "axiom-api",
+    "interpolation",
+    "reflect-module",
+    "universal-module",
     "spry-start"
   ],
   "root": true

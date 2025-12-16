@@ -5,7 +5,8 @@
     "introduction",
     "installation",
     "quick-start",
-    "first-project"
+    "first-project",
+    "usecases"
   ],
   "root": true
 }

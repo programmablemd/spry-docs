@@ -12,13 +12,7 @@
     "environment-variables",
     "common-workflows",
     "dag",
-    "ast",
-    "architecture-deep-drive",
-    "plugin-development-guide",
-    "axiom-graph-engine",
-    "interpolation",
-    "reflect-module",
-    "universal-module"
+    "ast"
   ],
   "root": true
 }

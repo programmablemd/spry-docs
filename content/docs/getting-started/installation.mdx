@@ -13,7 +13,7 @@ import { Steps, Step } from 'fumadocs-ui/components/steps';
 
 Spry can be installed via multiple methods depending on your platform and preferences. Choose the method that works best for your workflow.
 
-<Tabs items={['Homebrew', 'Binary Download', 'Deno']}>
+<Tabs items={['Homebrew', 'Binary Download']}>
   <Tab value="Homebrew">
     ### Homebrew (Recommended for macOS & Linux)
     
@@ -34,6 +34,24 @@ Spry can be installed via multiple methods depending on your platform and prefer
     <Callout type="info">
     Homebrew automatically manages updates and dependencies, making it the recommended installation method for most users.
     </Callout>
+
+    #### Install Specific Version
+
+    To install a specific version of Spry:
+
+    **Option 1: Using version suffix**
+
+    ```bash
+    brew install programmablemd/packages/spry@0.102.1
+    ```
+
+    **Option 2: Switch between installed versions**
+
+    If you have multiple versions installed:
+
+    ```bash
+    brew unlink spry@0.102.1 && brew link spry@0.101.3
+    ```
   </Tab>
 
   <Tab value="Binary Download">
@@ -85,27 +103,6 @@ Spry can be installed via multiple methods depending on your platform and prefer
 
     <Callout type="warning">
     Manual binary installations won't receive automatic updates. You'll need to download new versions manually.
-    </Callout>
-  </Tab>
-
-  <Tab value="Deno">
-    ### Run Directly with Deno
-    
-    If you have [Deno 2.5+](https://deno.land) installed, you can run Spry without installation:
-
-    ```bash
-    # Initialize a new Spry project
-    deno run --node-modules-dir=auto -A \
-      https://raw.githubusercontent.com/programmablemd/spry/main/lib/playbook/sqlpage/cli.ts init
-    ```
-
-    This approach is useful for:
-    - Quick testing without committing to an installation
-    - CI/CD environments where you want to use specific versions
-    - Containerized deployments
-
-    <Callout>
-    The Deno runtime is required for this method. Install Deno from [deno.land](https://deno.land) if you don't have it already.
     </Callout>
   </Tab>
 </Tabs>

@@ -11,7 +11,8 @@
     "interpolation",
     "reflect-module",
     "universal-module",
-    "custom-extensions"
+    "custom-extensions",
+    "spry-start"
   ],
   "root": true
 }

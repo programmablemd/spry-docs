@@ -10,7 +10,8 @@
     "axiom-api",
     "interpolation",
     "reflect-module",
-    "universal-module"
+    "universal-module",
+    "spry-start"
   ],
   "root": true
 }

@@ -208,7 +208,7 @@ echo "Clean complete!"
 
 ### Step 2: Build
 
-```bash build --depends clean --descr "Build the project"
+```bash build --dep clean --descr "Build the project"
 echo "Building..."
 echo "Build artifact" > output/app.txt
 echo "Build complete!"
@@ -216,7 +216,7 @@ echo "Build complete!"
 
 ### Step 3: Deploy
 
-```bash deploy --depends build --descr "Deploy the application"
+```bash deploy --dep build --descr "Deploy the application"
 echo "Deploying..."
 cat output/app.txt
 echo "Deploy complete!"
@@ -279,7 +279,7 @@ Here are the most useful options for code blocks:
 | Option | Purpose | Example |
 |--------|---------|---------|
 | `--descr "..."` | Human-readable description | `--descr "Build the app"` |
-| `--depends task1,task2` | Task dependencies | `--depends clean,test` |
+| `--dep task1,task2` | Task dependencies | `--dep clean,test` |
 | `--silent` | Suppress output | `--silent` |
 | `-C <path>` | Capture output to file | `-C ./results.json` |
 | `--gitignore` | Add captured file to .gitignore | `--gitignore` |
@@ -287,7 +287,7 @@ Here are the most useful options for code blocks:
 Example with multiple options:
 
 ````markdown
-```bash test --descr "Run test suite" --depends build --silent
+```bash test --descr "Run test suite" --dep build --silent
 npm test
 ```
 ````

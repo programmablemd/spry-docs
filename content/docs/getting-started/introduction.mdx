@@ -59,11 +59,11 @@ rm -rf dist/ build/
 Define dependencies between tasks to create complex workflows. Spry automatically resolves the execution order and can run independent tasks in parallel.
 
 ````markdown
-```bash test --depends build
+```bash test --dep build
 npm test
 ```
 
-```bash deploy --depends test
+```bash deploy --dep test
 ./deploy.sh production
 ```
 ````

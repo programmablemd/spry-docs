@@ -238,7 +238,7 @@ Parses code fence info strings (like ` ```bash task-name --flag value ```) into 
 ```typescript
 import { parseCodeFenceInfo } from "./cline.ts";
 
-const info = parseCodeFenceInfo("bash task-name --descr 'Build the app' --depends setup,test");
+const info = parseCodeFenceInfo("bash task-name --descr 'Build the app' --dep setup,test");
 // Returns:
 // {
 //   language: "bash",

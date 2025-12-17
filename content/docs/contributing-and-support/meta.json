@@ -11,6 +11,7 @@
     "interpolation",
     "reflect-module",
     "universal-module",
+    "custom-extensions",
     "spry-start",
     "api-doc"
   ],

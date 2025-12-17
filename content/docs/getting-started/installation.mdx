@@ -258,27 +258,7 @@ EOF
 source .env
 ```
 
-### Installation Troubleshooting
-
-<Callout type="error">
-**"Command not found: spry"**
-
-The Spry binary is not in your PATH. Try:
-1. Restart your terminal after installation
-2. Check if Homebrew's bin directory is in your PATH: `echo $PATH | grep brew`
-3. Use the full path: `./spry.ts` (when using project-local installation)
-</Callout>
-
-#### Permission Issues
-
-If you encounter permission errors on macOS:
-
-```bash
-# Remove quarantine attribute
-xattr -d com.apple.quarantine /usr/local/bin/spry
-```
-
-#### Updating Spry
+### Updating Spry
 
 <Tabs items={['Homebrew', 'Manual']}>
   <Tab value="Homebrew">

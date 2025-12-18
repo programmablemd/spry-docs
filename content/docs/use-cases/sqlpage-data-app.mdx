@@ -169,10 +169,10 @@ SQLPage lets you build full-featured web applications using only SQL queries. Co
     source .envrc  # or use direnv
 
     # Prepare the database
-    ./spry.ts rb task prepare-db
+    spry rb task prepare-db
 
     # Build the SQLPage site
-    ./spry.ts sp spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
+    spry sp spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
 
     # Start SQLPage server
     sqlpage
@@ -193,7 +193,7 @@ SQLPage lets you build full-featured web applications using only SQL queries. Co
     For active development with automatic rebuilding:
 
     ```bash
-    ./spry.ts sp spc --fs dev-src.auto --destroy-first \
+    spry sp spc --fs dev-src.auto --destroy-first \
       --conf sqlpage/sqlpage.json --watch --with-sqlpage
     ```
 
@@ -209,7 +209,7 @@ SQLPage lets you build full-featured web applications using only SQL queries. Co
     Package everything into the database for deployment:
 
     ```bash
-    ./spry.ts sp spc --package --conf sqlpage/sqlpage.json | sqlite3 sales.db
+    spry sp spc --package --conf sqlpage/sqlpage.json | sqlite3 sales.db
     ```
 
     This stores all SQL files in the `sqlpage_files` table within `sales.db`.
@@ -234,19 +234,19 @@ SQLPage lets you build full-featured web applications using only SQL queries. Co
 ## Customization Ideas
 
 <Cards>
-  <Card title="Add Authentication" icon="Lock">
+  <Card title="Add Authentication">
     Use SQLPage's authentication components to add login and user sessions
   </Card>
   
-  <Card title="Real-Time Updates" icon="RefreshCw">
+  <Card title="Real-Time Updates">
     Add auto-refresh with meta tags or HTMX for live dashboards
   </Card>
   
-  <Card title="Export Features" icon="Download">
+  <Card title="Export Features">
     Add CSV/PDF export buttons using SQLPage's file generation
   </Card>
   
-  <Card title="Multi-Tenant" icon="Users">
+  <Card title="Multi-Tenant">
     Add tenant filtering in queries for SaaS applications
   </Card>
 </Cards>

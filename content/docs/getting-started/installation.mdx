@@ -230,7 +230,7 @@ Spry works well with `direnv` for automatic environment variable management:
     Spry can generate `.envrc` files automatically:
 
     ```markdown
-    ```envrc prepare-env -C ./.envrc --gitignore
+    ```envrc prepare-env -C ./.envrc --gitignore --descr "Generate .envrc file and add it to local .gitignore if it's not already there"
     export SPRY_DB="sqlite://app.db?mode=rwc"
     export PORT=9227
     ```
@@ -249,13 +249,13 @@ If you prefer not to use direnv, you can source environment files manually:
 
 ```bash
 # Create environment file
-cat > .env << 'EOF'
+cat > .envrc << 'EOF'
 export SPRY_DB="sqlite://app.db?mode=rwc"
 export PORT=9227
 EOF
 
 # Load environment
-source .env
+source .envrc
 ```
 
 ### Updating Spry

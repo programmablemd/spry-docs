@@ -32,13 +32,8 @@ Let's create and execute your first executable Markdown file in under 5 minutes.
 
     | File | Purpose |
     |------|---------|
-    | `spry.ts` | Executable wrapper to run Spry commands locally |
     | `Spryfile.md` | Your executable Markdown document |
-    | `import_map.json` | Deno import mappings for dependencies |
 
-    <Callout type="info">
-    The `spry.ts` file makes it easy to run Spry commands without typing the full Deno command each time. Just use `./spry.ts` instead.
-    </Callout>
   </Step>
 
   <Step>
@@ -61,7 +56,7 @@ Let's create and execute your first executable Markdown file in under 5 minutes.
     **Environment Setup** - Environment variables in an executable code block:
     
     ````markdown
-    ```envrc prepare-env -C ./.envrc --gitignore
+    ```envrc prepare-env -C ./.envrc --gitignore --descr "Generate .envrc file and add it to local .gitignore if it's not already there"
     export SPRY_DB="sqlite://sqlpage.db?mode=rwc"
     export PORT=9227
     ```
@@ -240,7 +235,7 @@ When you run `deploy`, Spry automatically executes `clean` first, then `build`, 
 See the task execution flow visually:
 
 ```bash
-spry rb run --visualize plain
+spry rb run --visualize ascii-tree
 ```
 
 This shows a directed acyclic graph (DAG) of your tasks:

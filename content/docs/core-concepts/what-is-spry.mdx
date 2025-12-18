@@ -94,11 +94,11 @@ This document defines our build process. Run it with `./spry.ts task run build`.
 
 First, we format and lint the code:
 
-```bash format --desc "Format all TypeScript files"
+```bash format --descr "Format all TypeScript files"
 deno fmt
 ```
 
-```bash lint --dep format --desc "Lint after formatting"
+```bash lint --dep format --descr "Lint after formatting"
 deno lint
 ```
 
@@ -106,14 +106,14 @@ deno lint
 
 Once code quality checks pass, we compile:
 
-```bash build --dep lint --desc "Compile TypeScript to JavaScript"
+```bash build --dep lint --descr "Compile TypeScript to JavaScript"
 deno task compile
 ```
 ````
 
 ### What's Happening in This Code?
 
-Let's break down the fence header `bash lint --dep format --desc "Lint after formatting"`:
+Let's break down the fence header `bash lint --dep format --descr "Lint after formatting"`:
 
 **`bash`** - The language identifier. Tells Spry to execute this block using the bash shell. Spry supports bash, sh, zsh, powershell, python, typescript, sql, duckdb, and more.
 
@@ -121,7 +121,7 @@ Let's break down the fence header `bash lint --dep format --desc "Lint after for
 
 **`--dep format`** - Dependency declaration. This task will not run until the `format` task completes successfully. You can specify multiple dependencies: `--dep format --dep typecheck`.
 
-**`--desc "..."`** - Human-readable description. Shows up when you run `task ls` to list available tasks.
+**`--descr "..."`** - Human-readable description. Shows up when you run `task ls` to list available tasks.
 
 <Callout>
 **The key insight:** The text after the triple backticks is not just a language hint for syntax highlighting—it is a complete task specification.
@@ -229,13 +229,13 @@ Your README includes setup instructions:
 
 Install dependencies:
 
-```bash install --desc "Install project dependencies"
+```bash install --descr "Install project dependencies"
 npm install
 ```
 
 Run the development server:
 
-```bash dev --dep install --desc "Start dev server"
+```bash dev --dep install --descr "Start dev server"
 npm run dev
 ```
 ````
@@ -256,7 +256,7 @@ Infrastructure automation often lives in cryptic scripts. With Spry:
 
 Before touching the database, verify backups exist:
 
-```bash check-backups --desc "Verify recent backup exists"
+```bash check-backups --descr "Verify recent backup exists"
 aws s3 ls s3://backups/db/ | grep $(date +%Y-%m-%d)
 ```
 
@@ -264,7 +264,7 @@ aws s3 ls s3://backups/db/ | grep $(date +%Y-%m-%d)
 
 Only proceed if backups are confirmed:
 
-```bash migrate --dep check-backups --desc "Apply database migrations"
+```bash migrate --dep check-backups --descr "Apply database migrations"
 DATABASE_URL=$PROD_DB alembic upgrade head
 ```
 ````

@@ -57,10 +57,7 @@ Before starting, ensure you have:
     
     | File | Purpose |
     |------|---------|
-    | `spry.ts` | Executable CLI wrapper |
     | `Spryfile.md` | Your application definition (we'll replace this) |
-    | `import_map.json` | Deno import mappings |
-    | `sqlpage/sqlpage.json` | SQLPage configuration |
 
     <Callout>
     The init command sets up a complete project structure. We'll customize the Spryfile in the next step.
@@ -441,9 +438,7 @@ After completing all steps, your project has this structure:
 
 ```
 sales-dashboard/
-├── spry.ts                 # CLI wrapper for running Spry commands
 ├── Spryfile.md             # Your application definition (source of truth)
-├── import_map.json         # Deno import mappings
 ├── .envrc                  # Environment variables (git-ignored)
 ├── .gitignore              # Git ignore rules
 ├── sales.db                # SQLite database with data and packaged app

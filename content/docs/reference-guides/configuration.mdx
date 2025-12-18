@@ -292,19 +292,19 @@ deployment:
 ### Use Cases
 
 <Cards>
-  <Card title="Documentation Generation" icon="BookOpen">
+  <Card title="Documentation Generation">
     Extract project info for README generation and API docs
   </Card>
   
-  <Card title="Deployment Automation" icon="Rocket">
+  <Card title="Deployment Automation">
     Use metadata to route deployments to correct environments
   </Card>
   
-  <Card title="Compliance Tracking" icon="Shield">
+  <Card title="Compliance Tracking">
     Track audit requirements and test status
   </Card>
   
-  <Card title="Custom Workflows" icon="GitBranch">
+  <Card title="Custom Workflows">
     Build domain-specific automation based on metadata
   </Card>
 </Cards>
@@ -501,103 +501,6 @@ sql seed-data.sql TAIL
 Directives like `PARTIAL` and `import` are processed during the build phase and affect how other cells are generated or combined.
 </Callout>
 
-## Project Files
-
-Understanding the files Spry generates and uses.
-
-### spry.ts
-
-The CLI wrapper that invokes Spry:
-
-```typescript
-#!/usr/bin/env -S deno run -A --import-map=import_map.json
-
-import { CLI } from "path/to/spry/bin/spry.ts";
-
-CLI.instance().run();
-```
-
-**Make it executable:**
-```bash
-chmod +x spry.ts
-```
-
-**Usage:**
-```bash
-spry rb run Spryfile.md
-spry sp spc --help
-```
-
-### import_map.json
-
-Deno import mappings for dependency management:
-
-```json
-{
-  "imports": {
-    "@std/": "jsr:@std/",
-    "zod": "npm:zod@^3.25.0",
-    "date-fns": "npm:date-fns@^3.0.0"
-  }
-}
-```
-
-**Purpose:**
-- Map package names to URLs
-- Specify version constraints
-- Share dependencies across modules
-
-### sqlpage/sqlpage.json
-
-Generated SQLPage configuration (auto-created from frontmatter):
-
-```json
-{
-  "database_url": "sqlite://app.db?mode=rwc",
-  "web_root": "./dev-src.auto",
-  "port": 9227,
-  "allow_exec": true,
-  "compress_responses": true
-}
-```
-
-<Callout type="warning">
-**Auto-Generated File**
-
-This file is generated from your Spryfile frontmatter. Don't edit it directly - modify the `sqlpage-conf` section in your Spryfile instead.
-</Callout>
-
-## Directory Structure
-
-Typical Spry project layout:
-
-```
-project/
-├── spry.ts                 # CLI wrapper (executable)
-├── Spryfile.md             # Main executable document
-├── import_map.json         # Deno import mappings
-├── .envrc                  # Environment variables (git-ignored)
-├── .gitignore              # Git ignore rules
-├── README.md               # Project documentation
-├── sqlpage/
-│   └── sqlpage.json        # SQLPage config (auto-generated)
-├── lib/                    # Shared code/queries
-│   ├── queries/
-│   └── utils/
-├── dev-src.auto/           # Generated SQL files (git-ignored)
-│   ├── index.sql
-│   ├── dashboard.sql
-│   └── ...
-└── dist/                   # Production builds (git-ignored)
-    └── app.db              # Packaged database
-```
-
-<Callout>
-**Source of Truth**
-
-The `Spryfile.md` is your source of truth. All files in `dev-src.auto/` and `sqlpage/sqlpage.json` are generated and should be git-ignored.
-</Callout>
-
 ## Configuration Precedence
 
 When the same setting is defined in multiple places, Spry uses this priority order:
@@ -788,29 +691,3 @@ sqlpage-conf:
 ```
 
 The `:-` syntax provides defaults when variables aren't set.
-
-## Next Steps
-
-<Cards>
-  <Card title="First Project" href="/docs/getting-started/first-project">
-    Apply these configuration concepts in a real project
-  </Card>
-  
-  <Card title="Environment Variables" href="/docs/core-concepts/spryfiles#environment-variable-interpolation">
-    Deep dive into variable interpolation
-  </Card>
-  
-  <Card title="SQLPage Guide" href="/docs/guides/sqlpage">
-    Build data applications with SQLPage configuration
-  </Card>
-  
-  <Card title="CLI Reference" href="/docs/reference/cli-commands">
-    Explore all available commands and options
-  </Card>
-</Cards>
-
-<Callout type="success">
-**Configuration Mastery**
-
-With a solid understanding of Spry's configuration system, you can build flexible applications that work seamlessly across development, staging, and production environments.
-</Callout>

@@ -101,7 +101,7 @@ By embedding tests directly in documentation, you ensure evidence collection is 
 
     ```bash
     # Run the test case
-    ./spry.ts rb run test-case-TC001.md
+    spry rb run test-case-TC001.md
 
     # View the captured evidence
     cat ./evidence/tc001-results.json
@@ -163,7 +163,7 @@ By embedding tests directly in documentation, you ensure evidence collection is 
 
     Run all tests:
     ```bash
-    ./spry.ts rb run compliance/**/*.md --summarize
+    spry rb run compliance/**/*.md --summarize
     ```
   </Tab>
 
@@ -174,7 +174,7 @@ By embedding tests directly in documentation, you ensure evidence collection is 
 
     ```bash
     # Run tests daily at 2 AM
-    0 2 * * * cd /opt/compliance && ./spry.ts rb run **/*.md --verbose json > daily-results.json
+    0 2 * * * cd /opt/compliance && spry rb run **/*.md --verbose json > daily-results.json
     ```
 
     Or use GitHub Actions:
@@ -188,7 +188,7 @@ By embedding tests directly in documentation, you ensure evidence collection is 
         runs-on: ubuntu-latest
         steps:
           - uses: actions/checkout@v2
-          - run: ./spry.ts rb run compliance/**/*.md
+          - run: spry rb run compliance/**/*.md
     ```
   </Tab>
 
@@ -199,10 +199,10 @@ By embedding tests directly in documentation, you ensure evidence collection is 
 
     ```bash
     # Generate HTML report
-    ./spry.ts rb run compliance/**/*.md --format html > compliance-report.html
+    spry rb run compliance/**/*.md --format html > compliance-report.html
 
     # Generate JSON for dashboard integration
-    ./spry.ts rb run compliance/**/*.md --format json | \
+    spry rb run compliance/**/*.md --format json | \
       jq '.results[] | {control, status, lastExecuted}' > dashboard-data.json
     ```
   </Tab>

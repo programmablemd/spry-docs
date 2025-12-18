@@ -56,7 +56,7 @@ Spry supports two deployment modes:
     Generate `.sql` files to a directory. Fast iteration with `--watch`:
     
     ```bash
-    ./spry.ts spc --fs dev-src.auto --watch
+    spry spc --fs dev-src.auto --watch
     ```
     
     Perfect for rapid development with live reloading.
@@ -68,7 +68,7 @@ Spry supports two deployment modes:
     Store routes directly in the database. Single-database deployment:
     
     ```bash
-    ./spry.ts task deploy
+    spry task deploy
     ```
     
     Ideal for production deployments with all routes in the database.

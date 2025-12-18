@@ -19,7 +19,7 @@ Welcome to Spry! We're excited that you want to contribute. This guide will help
   <Step>
     ### Read the Development Setup
     
-    Familiarize yourself with the [Development Setup](./development-setup) guide to understand the project structure and tooling.
+    Familiarize yourself with the [Development Setup](/docs/getting-started/quick-start) guide to understand the project structure and tooling.
   </Step>
   
   <Step>
@@ -36,7 +36,7 @@ Welcome to Spry! We're excited that you want to contribute. This guide will help
 </Steps>
 
 <Callout type="info">
-**💡 First Time Contributing?**
+**First Time Contributing?**
 
 Don't worry! We welcome contributions from developers of all experience levels. Start with issues labeled `good first issue` to get familiar with the codebase.
 </Callout>
@@ -74,7 +74,7 @@ Create a GitHub issue with the following information:
 - **Code samples** if applicable
 
 <Callout type="warn">
-**⚠️ Security Issues**
+**Security Issues**
 
 If you discover a security vulnerability, please email the maintainers directly instead of creating a public issue.
 </Callout>
@@ -174,7 +174,7 @@ deno lint
 ```
 
 <Callout>
-**🧪 Test Coverage**
+**Test Coverage**
 
 Aim for comprehensive test coverage including happy paths, edge cases, and error conditions. Tests should be clear and maintainable.
 </Callout>
@@ -184,11 +184,11 @@ Aim for comprehensive test coverage including happy paths, edge cases, and error
 Use semantic commit messages that follow our convention:
 
 ```bash
-git commit -m "feat(axiom): add custom edge rule support"
-git commit -m "fix(runbook): resolve dependency cycle detection"
-git commit -m "docs: update contributing guide"
-git commit -m "test(task): add execution plan tests"
-git commit -m "refactor(shell): simplify command parsing"
+git commit -m "feat(axiom): add custom edge rule support #<ticket-number>"
+git commit -m "fix(runbook): resolve dependency cycle detection #<ticket-number>"
+git commit -m "docs: update contributing guide #<ticket-number>"
+git commit -m "test(task): add execution plan tests #<ticket-number>"
+git commit -m "refactor(shell): simplify command parsing #<ticket-number>"
 ```
 
 ### 6. Push and Create Pull Request
@@ -281,7 +281,7 @@ We follow a structured commit message format for clarity and consistency:
 Follow these guidelines for consistent, maintainable code:
 
 ```typescript
-// ✅ Good: Explicit types, descriptive names
+// Good: Explicit types, descriptive names
 function processTask(task: ExecutableTask): TaskResult {
   const taskId = task.taskId();
   const dependencies = task.dependencies();
@@ -293,7 +293,7 @@ function processTask(task: ExecutableTask): TaskResult {
   };
 }
 
-// ❌ Avoid: Implicit types, unclear names
+// Avoid: Implicit types, unclear names
 function proc(t: any) {
   const id = t.taskId();
   return { id, status: 'completed' };
@@ -486,7 +486,7 @@ Closes #123
 ```
 
 <Callout type="info">
-**📝 Clear Communication**
+**Clear Communication**
 
 A well-written PR description helps reviewers understand your changes quickly and provides context for future reference.
 </Callout>
@@ -556,7 +556,7 @@ We are committed to providing a welcoming and inclusive environment. All contrib
 By contributing to Spry, you agree that your contributions will be licensed under the project's MIT License.
 
 <Callout>
-**🙏 Thank You**
+** Thank You**
 
 Every contribution, no matter how small, helps make Spry better for everyone. We appreciate your time and effort!
 </Callout>

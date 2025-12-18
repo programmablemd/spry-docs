@@ -52,7 +52,7 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
     echo "OK: Git working directory is clean"
     \`\`\`
 
-    \`\`\`bash check-tests --descr "Run test suite" --depends check-git-status
+    \`\`\`bash check-tests --descr "Run test suite" --dep check-git-status
     #!/usr/bin/env -S bash
     set -e
 
@@ -69,7 +69,7 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
 
     ## Build Phase
 
-    \`\`\`bash build-app --descr "Build production artifacts" --depends check-tests
+    \`\`\`bash build-app --descr "Build production artifacts" --dep check-tests
     #!/usr/bin/env -S bash
     set -e
 
@@ -102,7 +102,7 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
 
     ## Deployment
 
-    \`\`\`bash deploy --descr "Deploy to production" --depends build-app,health-check
+    \`\`\`bash deploy --descr "Deploy to production" --dep build-app,health-check
     #!/usr/bin/env -S bash
     set -e
 
@@ -119,7 +119,7 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
 
     ## Post-Deployment Verification
 
-    \`\`\`bash verify-deployment --descr "Verify deployment success" --depends deploy
+    \`\`\`bash verify-deployment --descr "Verify deployment success" --dep deploy
     #!/usr/bin/env -S bash
     set -e
 
@@ -152,7 +152,7 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
     <Callout>
     **Dependency Graph**
 
-    The `--depends` flag creates a dependency graph, ensuring tasks run in the correct order. Spry automatically builds and executes the DAG.
+    The `--dep` flag creates a dependency graph, ensuring tasks run in the correct order. Spry automatically builds and executes the DAG.
     </Callout>
   </Step>
 

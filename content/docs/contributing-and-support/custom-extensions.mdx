@@ -248,8 +248,8 @@ function extractTaskId(node: Code): string | undefined {
 }
 
 function extractDependencies(node: Code): string[] {
-  // Parse --depends from meta
-  const match = node.meta?.match(/--depends\s+(\S+)/);
+  // Parse --dep from meta
+  const match = node.meta?.match(/--dep\s+(\S+)/);
   return match ? match[1].split(",") : [];
 }
 ```
@@ -573,7 +573,7 @@ Write comprehensive tests for your custom extensions to ensure reliability.
   <Tab value="Rule Tests">
     ```typescript
     Deno.test("custom rule generates edges", async () => {
-      const md = `\`\`\`sql a\nSELECT 1\n\`\`\`\n\`\`\`sql b --depends a\nSELECT 2\n\`\`\``;
+      const md = `\`\`\`sql a\nSELECT 1\n\`\`\`\n\`\`\`sql b --dep a\nSELECT 2\n\`\`\``;
 
       const edges = [...astGraphEdges(parse(md), {
         prepareContext: (r) => ({ root: r }),

@@ -412,7 +412,7 @@ Cell-level options configure individual code blocks.
       </tr>
       <tr>
         <td className="px-4 py-3 text-sm font-semibold">Dependencies</td>
-        <td className="px-4 py-3 text-sm font-mono text-purple-600 dark:text-purple-400">--depends a,b,c</td>
+        <td className="px-4 py-3 text-sm font-mono text-purple-600 dark:text-purple-400">--dep a,b,c</td>
         <td className="px-4 py-3 text-sm">Required tasks (comma-separated)</td>
       </tr>
       <tr>
@@ -441,7 +441,7 @@ Cell-level options configure individual code blocks.
 
 **Example:**
 ````markdown
-```bash build-app --descr "Build production bundle" --depends test,lint -C ./dist/output.log --gitignore
+```bash build-app --descr "Build production bundle" --dep test,lint -C ./dist/output.log --gitignore
 npm run build
 ```
 ````

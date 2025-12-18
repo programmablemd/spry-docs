@@ -16,7 +16,7 @@ Follow these steps to set up and run your development environment:
 ### Initialize project
 
 ```bash
-./spry.ts init
+spry sp init
 ```
 
 Initializes the project structure and dependencies.
@@ -26,7 +26,7 @@ Initializes the project structure and dependencies.
 ### Start development server with live reload
 
 ```bash
-./spry.ts spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json --watch --with-sqlpage
+spry sp spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json --watch --with-sqlpage
 ```
 
 Launches a development server with automatic file watching and live reload.
@@ -36,8 +36,8 @@ Launches a development server with automatic file watching and live reload.
 ### List and execute tasks as needed
 
 ```bash
-./spry.ts task ls
-./spry.ts task prepare-db
+spry rb task ls
+spry rb task prepare-db
 ```
 
 Provides task management capabilities for database preparation and other setup tasks.
@@ -65,7 +65,7 @@ Removes temporary development files.
 ### Package and deploy to database
 
 ```bash
-./spry.ts spc --package --conf sqlpage/sqlpage.json | sqlite3 production.db
+spry sp spc --package --conf sqlpage/sqlpage.json | sqlite3 production.db
 ```
 
 Packages the application and deploys it to the production database.
@@ -93,7 +93,7 @@ Manage and execute tasks efficiently:
 ### List available tasks
 
 ```bash
-./spry.ts task ls
+spry rb task ls
 ```
 
 Displays all available tasks in the project.
@@ -103,7 +103,7 @@ Displays all available tasks in the project.
 ### Execute specific task
 
 ```bash
-./spry.ts task my-task --verbose rich
+spry rb task my-task --verbose rich
 ```
 
 Runs a specific task with detailed verbose output.
@@ -113,7 +113,7 @@ Runs a specific task with detailed verbose output.
 ### Execute all tasks in order
 
 ```bash
-./spry.ts runbook --summarize
+spry rb run --summarize
 ```
 
 Executes all tasks sequentially with a summary of results.

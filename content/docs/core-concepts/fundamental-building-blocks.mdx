@@ -21,7 +21,7 @@ A **cell** is any fenced code block in Markdown. Cells are the atomic units of c
 **Basic Example:**
 
 ```markdown
-```bash task-name
+```bash task-name --descr "Description of the task"
 echo "This is a cell"
 ` ` `
 ```
@@ -42,7 +42,7 @@ Spry recognizes four types of cells:
 Every cell has multiple parts that define its behavior:
 
 ```markdown
-```bash task-name --flag value { "attr": "value" }
+```bash task-name --flag value { "attr": "value" } --desc "Description of the task"
 #!/usr/bin/env bash
 echo "cell content"
 ` ` `
@@ -480,15 +480,15 @@ compile → test → deploy
 ### Multiple Dependencies
 
 ```markdown
-```bash lint
+```bash lint --descr "Lint the code"
 eslint src/
 ` ` `
 
-```bash typecheck
+```bash typecheck --descr "Type check the code"
 tsc --noEmit
 ` ` `
 
-```bash build --dep lint --dep typecheck
+```bash build --dep lint --dep typecheck --descr "Build the project"
 npm run build
 ` ` `
 ```
@@ -526,19 +526,19 @@ Spry uses **topological sort** to determine execution order:
 **Example:**
 
 ```markdown
-```bash a
+```bash a --descr "Task A"
 echo "A"
 ` ` `
 
-```bash b --dep a
+```bash b --dep a --descr "Task B"
 echo "B"
 ` ` `
 
-```bash c --dep a
+```bash c --dep a --descr "Task C"
 echo "C"
 ` ` `
 
-```bash d --dep b --dep c
+```bash d --dep b --dep c --descr "Task D"
 echo "D"
 ` ` `
 ```
@@ -556,11 +556,11 @@ Step 3: d          (depends on b and c)
 Spry prevents circular dependencies:
 
 ```markdown
-```bash task-a --dep task-b
+```bash task-a --dep task-b --descr "Task A"
 echo "A"
 ` ` `
 
-```bash task-b --dep task-a
+```bash task-b --dep task-a --descr "Task B"
 echo "B"
 ` ` `
 ```
@@ -581,15 +581,15 @@ Isolate tasks into separate graphs:
 npm run build
 ` ` `
 
-```bash test --dep build
+```bash test --dep build --descr "Run tests"
 npm test
 ` ` `
 
-```bash clean --graph maintenance
+```bash clean --graph maintenance --descr "Clean build artifacts"
 rm -rf dist/
 ` ` `
 
-```bash reset --graph maintenance --dep clean
+```bash reset --graph maintenance --dep clean --descr "Reset environment"
 git clean -fdx
 ` ` `
 ```
@@ -602,8 +602,8 @@ git clean -fdx
 Run specific graph:
 
 ```bash
-spry run file.md              # Runs main graph
-spry run file.md --graph maintenance  # Runs maintenance graph
+spry rb run file.md              # Runs main graph
+spry rb run file.md --graph maintenance  # Runs maintenance graph
 ```
 
 ## Partials
@@ -693,7 +693,7 @@ Glob patterns control where partials inject:
 Use `--interpolate` or `-I`:
 
 ```markdown
-```bash deploy -I
+```bash deploy -I --descr "Deploy the app"
 echo "Deploying version ${env.APP_VERSION}"
 ` ` `
 ```
@@ -703,7 +703,7 @@ echo "Deploying version ${env.APP_VERSION}"
 Uses JavaScript template literal syntax:
 
 ```markdown
-```bash greet -I
+```bash greet -I --descr "Greet user"
 echo "Hello, ${env.USER || 'World'}!"
 echo "Date: ${new Date().toISOString()}"
 ` ` `
@@ -714,7 +714,7 @@ echo "Date: ${new Date().toISOString()}"
 <Cards>
   <Card title="Environment Variables">
     ```markdown
-    ```bash -I
+    ```bash -I --descr "Show env vars"
     echo "Home: ${env.HOME}"
     echo "Path: ${env.PATH}"
     ` ` `
@@ -723,7 +723,7 @@ echo "Date: ${new Date().toISOString()}"
   
   <Card title="Frontmatter Access">
     ```markdown
-    ```bash -I
+    ```bash -I --descr "Show frontmatter"
     echo "App: ${fm.app.name} v${fm.app.version}"
     ` ` `
     ```
@@ -731,7 +731,7 @@ echo "Date: ${new Date().toISOString()}"
   
   <Card title="Captured Output">
     ```markdown
-    ```bash deploy -I --dep get-version
+    ```bash deploy -I --dep get-version --descr "Deploy app"
     docker build -t myapp:${captured.version} .
     ` ` `
     ```

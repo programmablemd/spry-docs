@@ -12,7 +12,8 @@
     "reflect-module",
     "universal-module",
     "custom-extensions",
-    "spry-start"
+    "spry-start",
+    "api-doc"
   ],
   "root": true
 }

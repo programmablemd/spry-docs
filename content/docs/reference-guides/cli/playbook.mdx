@@ -1,0 +1,426 @@
+---
+title: Playbooks
+description: Domain-specific operational patterns expressed in Markdown that define how Spry processes and emits content for specific use cases.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Playbooks are domain-specific operational patterns expressed in Markdown. They define how Spry processes and emits content for specific use cases.
+
+## What is a Playbook?
+
+A Spry Playbook is:
+
+- **Human-readable** — Written in Markdown
+- **Machine-actionable** — Axiom rules turn it into a graph
+- **Service-specific** — Projection and emitters for a domain
+- **Deterministic** — Reproducible outputs
+- **Composable** — Imports, partials, and behaviors
+
+## The Playbook Pipeline
+
+Every playbook follows the same conceptual flow:
+
+```
+Markdown → Parse → Analyze → Project → Emit
+```
+
+### Define
+
+Author Markdown with fenced blocks, frontmatter, decorators, and attributes.
+
+### Parse
+
+remark parses Markdown into an AST (mdast).
+
+### Analyze
+
+Axiom rules establish:
+
+- Structural edges (section hierarchy)
+- Semantic decorators (@id, @role)
+- Dependency relationships
+- Classification of cells
+
+### Project
+
+A specialized projection interprets the graph for the target domain.
+
+### Emit
+
+Concrete artifacts are produced:
+
+- SQL files
+- HTML pages
+- JSON data
+- Execution steps
+
+## Available Playbooks
+
+### SQLPage Playbook
+
+Build complete web applications using SQL and Markdown.
+
+**Use case:** Data dashboards, admin panels, internal tools
+
+**Artifacts:**
+
+- `.sql` files for SQLPage
+- `sqlpage_files` table entries
+- Route forests and breadcrumbs
+- Configuration files
+
+**Example:**
+
+```markdown
+---
+sqlpage-conf:
+  database_url: sqlite://app.db
+  port: 9227
+---
+
+# My Application
+
+​```sql index.sql { route: { caption: "Home" } }
+SELECT 'card' AS component, 'Welcome' AS title;
+​```
+```
+
+**Commands:**
+
+<Tabs items={['default', 'custom-file']}>
+  <Tab value="default">
+```bash
+spry sp spc --fs dev-src.auto --conf sqlpage/sqlpage.json
+spry sp spc --package | sqlite3 app.db
+```
+
+This uses the default `spryfile.md` in the current directory.
+  </Tab>
+  <Tab value="custom-file">
+```bash
+spry sp spc --fs dev-src.auto --conf sqlpage/sqlpage.json --md doctor.md
+spry sp spc --package | sqlite3 app.db
+```
+
+This uses a custom playbook file (`doctor.md`) instead of the default `spryfile.md`.
+  </Tab>
+</Tabs>
+
+### Runbook Playbook
+
+Automate operational procedures with executable documentation.
+
+**Use case:** DevOps, deployments, maintenance tasks
+
+**Artifacts:**
+
+- Executable shell tasks
+- Task DAG execution
+- Execution reports
+- JSON summaries
+
+**Example:**
+
+```markdown
+---
+runbook:
+  name: Deployment
+---
+
+# Deployment Runbook
+
+​```bash
+check --descr "Pre-flight checks"
+./preflight.sh
+​```
+
+​```bash
+deploy --depends check --descr "Deploy application"
+./deploy.sh
+​```
+```
+
+<Callout type="info">
+The task identifiers (`check`, `deploy`) are defined within the playbook file itself. They are not shell commands. Spry parses these task definitions and creates a DAG (directed acyclic graph) for execution.
+</Callout>
+
+**Commands:**
+
+<Tabs items={['default', 'custom-file']}>
+  <Tab value="default">
+```bash
+spry rb ls
+spry rb run --verbose rich
+spry rb task deploy
+```
+
+This uses the default `spryfile.md` in the current directory.
+  </Tab>
+  <Tab value="custom-file">
+```bash
+spry rb ls --md deployment.md
+spry rb run --verbose rich --md deployment.md
+spry rb task deploy --md deployment.md
+```
+
+This uses a custom playbook file (`deployment.md`) instead of the default `spryfile.md`.
+  </Tab>
+</Tabs>
+
+### Data Quality Playbook
+
+Define and execute data validation rules.
+
+**Use case:** Data pipelines, ETL validation, quality assurance
+
+**Artifacts:**
+
+- DQ tests and suites
+- SQL validation checks
+- JSON assertions
+- Provenance documents
+
+**Example:**
+
+```markdown
+# Data Quality Checks
+
+@dataset users
+## Users Table
+
+@expect row_count > 0
+​```sql check-users-exist
+SELECT COUNT(*) as count FROM users;
+​```
+
+@expect no_nulls email
+​```sql check-emails
+SELECT COUNT(*) FROM users WHERE email IS NULL;
+​```
+```
+
+### Compliance Playbook
+
+Document policies and generate compliance evidence.
+
+**Use case:** Audit preparation, policy documentation, evidence collection
+
+**Artifacts:**
+
+- Control mappings
+- Evidence documents
+- Audit trails
+- Status reports
+
+**Example:**
+
+```markdown
+---
+doc-classify:
+  role: evidence
+  framework: SOC2
+  control: CC6.1
+---
+
+# Access Control Verification
+
+​```bash verify-access -C ./evidence/access-check.json
+./audit-access.sh
+​```
+```
+
+## Playbook Components
+
+### Frontmatter
+
+Configure the playbook behavior:
+
+```yaml
+---
+sqlpage-conf:
+  database_url: ${env.SPRY_DB}
+  web_root: ./dev-src.auto
+
+playbook:
+  name: My Playbook
+  version: 1.0
+---
+```
+
+### Executable Cells
+
+Code that runs during execution:
+
+```markdown
+​```bash task-name --descr "Description"
+./script.sh
+​```
+```
+
+### Materializable Cells
+
+Content that becomes output files:
+
+```markdown
+​```sql page.sql
+SELECT 'text' AS component;
+​```
+```
+
+### Directives
+
+Control how content is processed:
+
+```markdown
+​```sql PARTIAL layout.sql --inject **/*
+SELECT 'shell' AS component;
+​```
+```
+
+### Decorators
+
+Attach metadata to sections:
+
+```markdown
+@id my-section
+## My Section
+```
+
+## Creating Custom Playbooks
+
+For advanced users, custom playbooks can be created by:
+
+1. Defining a projection that interprets the graph
+2. Creating emitters for target artifacts
+3. Building CLI commands
+
+See [Custom Extensions](../advanced/custom-extensions.md) for details.
+
+## Playbook Selection
+
+Spry determines the playbook based on:
+
+1. **Command used** — `rb` for runbook, `sp` for SQLPage
+2. **Frontmatter** — Configuration keys indicate type
+3. **File content** — Cell types and directives
+
+## Creating Tables with Runbooks
+
+You can use a Runbook to set up your database schema and seed initial data:
+
+```markdown
+---
+runbook:
+  name: Database Setup
+database:
+  url: sqlite://app.db
+---
+
+# Database Setup Runbook
+
+## Create Tables
+
+​```bash create-db
+sqlite3 app.db "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT UNIQUE, name TEXT);"
+​```
+
+## Insert Sample Data
+
+​```bash insert-data
+sqlite3 app.db "INSERT INTO users (email, name) VALUES ('alice@example.com', 'Alice');"
+​```
+
+## Verify Data
+
+​```bash verify
+sqlite3 app.db "SELECT * FROM users;"
+​```
+```
+
+Save this as `spryfile.md` and run:
+
+```bash
+spry rb run --verbose rich
+```
+
+This will create the `users` table, insert sample data, and verify it in your `app.db` file.
+
+## Best Practices
+
+### Single Responsibility
+
+Each Spryfile should focus on one playbook type:
+
+```markdown
+# Good - focused on SQLPage
+---
+sqlpage-conf:
+  database_url: sqlite://app.db
+---
+
+# App Dashboard
+​```sql index.sql
+...
+​```
+```
+
+<Callout type="info">
+Each Spryfile should maintain a single responsibility and focus on one playbook type to keep your documentation and execution clear.
+</Callout>
+
+### Clear Documentation
+
+Document the playbook's purpose:
+
+```markdown
+# Server Maintenance Runbook
+
+This runbook performs routine server maintenance:
+1. Check server health
+2. Backup databases
+3. Apply updates
+4. Verify services
+
+## Prerequisites
+- SSH access to servers
+- Database credentials in environment
+```
+
+### Reusable Components
+
+Use PARTIAL and imports for shared content:
+
+```markdown
+​```sql PARTIAL nav.sql --inject **/*.sql
+SELECT 'shell' AS component, 'App' AS title;
+​```
+
+​```import --base ./shared
+sql helpers.sql TAIL
+​```
+```
+
+<Callout type="tip">
+Leverage PARTIAL directives and imports to create reusable components across multiple playbooks and reduce duplication.
+</Callout>
+
+### Version Control
+
+Include version information:
+
+```yaml
+---
+playbook:
+  name: Deployment Pipeline
+  version: 2.1.0
+  updated: 2025-01-15
+---
+```
+
+## Related Topics
+
+- [Spryfiles](./spryfiles.md) - Document structure
+- [Code Cells](./code-cells.md) - Cell syntax
+- [Architecture](../advanced/architecture.md) - Internal design

@@ -5,7 +5,8 @@
     "options",
     "spry-axiom",
     "rb",
-    "sp"
+    "sp",
+    "playbook"
   ]
 }
 

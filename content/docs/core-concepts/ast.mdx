@@ -13,7 +13,7 @@ import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 Abstract Syntax Trees (AST) are structured, tree-like representations of source content.  
 In **Spry**, ASTs are widely used to inspect, transform, and automate workflows involving Markdown-based runbooks, configuration, and documentation.
 
-Spry internally parses Markdown into **mdast** (Markdown AST) so that automated tools can analyze nodes, extract metadata, transform blocks, or execute code cells in runbooks.
+Spry internally parses Markdown into **axiom** (Markdown AST) so that automated tools can analyze nodes, extract metadata, transform blocks, or execute code cells in runbooks.
 
 ---
 
@@ -34,7 +34,7 @@ In Spry, the AST lets you:
 - Modify or extract information  
 - Understand flow and dependencies between cells (useful for DAG execution)
 
-Spry mainly works with **mdast**, a Markdown AST format from the unified ecosystem.
+Spry mainly works with **axiom**, a Markdown AST format from the unified ecosystem.
 
 ---
 
@@ -59,7 +59,7 @@ Spry uses AST to:
 
 ### 3. Spry CLI Tools
 
-Commands like `./spry.ts mdast` allow:
+Commands like `spry axiom` allow:
 
 - Querying AST nodes
 - Listing node hierarchies
@@ -69,10 +69,26 @@ Commands like `./spry.ts mdast` allow:
 
 ## Possible SPRY AST Commands
 
+**Sample file.md:**
+
+````markdown title="file.md"
+# AST 
+Abstract Syntax Trees (AST) are structured, tree-like representations of source content.
+
+## Task
+
+``` bash tsk-1 --descr "Task1"
+echo "Task1"
+```
+``` bash tsk-2 --dep tsk-1 --descr "Task1"
+echo "Task2"
+``` 
+````
+
 ### 1. List Nodes
 
 ```bash
-./spry.ts mdast ls file.md
+spry axiom ls file.md
 ```
 
 Shows a structured view of all nodes.
@@ -80,88 +96,57 @@ Shows a structured view of all nodes.
 #### Example Output
 
 ```text
-1: root
- ├─ heading (level 1)
- ├─ paragraph
- ├─ code (lang: ts)
- └─ list (ordered: false)
+NAME                                     TYPE      FILE         DATA  
+---------------------------------------  --------  -----------  ------
+file.md                                  document                     
+└─ heading: #1 AST                       heading   file.md:1:1        
+   └─ heading: #2 Task                   heading   file.md:4:1        
+      ├─ code[tsk-1]: bash echo "Task1"  code      file.md:6:1  codeFM
+      └─ code[tsk-2]: bash echo "Task2"  code      file.md:9:1  codeFM
+
 ```
 
 ---
 
-### 2. List Identifiers
+### 2. Inspect mdast nodes as a hierarchy 
 
 ```bash
-./spry.ts mdast identifiers file.md
+spry axiom inspect file.md
 ```
 
-Useful for:
-
-- Extracting headings
-- Getting reference anchors
-- Documentation generation
-
----
-
-### 3. Filter by Node Type
-
-```bash
-./spry.ts mdast ls file.md --type code
-```
-
-Shows only code blocks.
-
----
-
-## Example Use Cases
-
-### Example Markdown
-
-````markdown title="sample.md"
-# Sample Runbook
-
-## Step 1
-```ts
-console.log("Hello")
-```
-
-## Step 2
-- item 1
-- item 2
-````
-
-### AST Listing Example
-
-```bash
-./spry.ts mdast ls sample.md
-```
-
-### Output Example
+#### Example Output
 
 ```text
-root
- ├─ heading (level 1): "Sample Runbook"
- ├─ heading (level 2): "Step 1"
- ├─ code: ts
- ├─ heading (level 2): "Step 2"
- └─ list
+├─0 heading[1] (1:1-1:7, 0-6)
+│   │ depth: 1
+│   └─0 text "AST" (1:3-1:6, 2-5)
+├─1 paragraph[1] (2:1-2:89, 7-95)
+│   └─0 text "Abstract Syntax Trees (AST) are structured, tree-like representations of source content." (2:1-2:89, 7-95)
+├─2 heading[1] (4:1-4:8, 97-104)
+│   │ depth: 2
+│   └─0 text "Task" (4:4-4:8, 100-104)
+├─3 code "echo \"Task1\"" (6:1-8:4, 106-153)
+│     lang: "bash"
+│     meta: "tsk-1 --descr \"Task1\""
+│     data: {"codeFM":{"lang":"bash","langSpec":{"id":"shell","aliases":["bash","sh","zsh"],"extensions":[".sh",".bash",".zsh"],"shebangs":["bash","sh","zsh"],"comment":{"line":["#"],"block":[]}},"meta":"tsk-1 --descr \"Task1\"","pi":{"args":["bash","tsk-1","--descr","Task1"],"pos":["tsk-1","descr"],"flags":{"tsk-1":true,"descr":"Task1"},"count":4,"posCount":2},"cmdLang":"bash","cli":"bash tsk-1 --descr \"Task1\"","fromPresets":[]}}
+│     nature: "EXECUTABLE"
+│     isActionableCodeCandidate: true
+│     spawnableIdentity: "tsk-1"
+│     language: {"id":"shell","aliases":["bash","sh","zsh"],"extensions":[".sh",".bash",".zsh"],"shebangs":["bash","sh","zsh"],"comment":{"line":["#"],"block":[]}}
+│     spawnableArgs: {"description":"Task1","deps":[],"graphs":[],"injectedDep":[]}
+│     memoizeOnly: false
+└─4 code "echo \"Task2\"" (9:1-11:5, 154-214)
+      lang: "bash"
+      meta: "tsk-2 --dep tsk-1 --descr \"Task1\""
+      data: {"codeFM":{"lang":"bash","langSpec":{"id":"shell","aliases":["bash","sh","zsh"],"extensions":[".sh",".bash",".zsh"],"shebangs":["bash","sh","zsh"],"comment":{"line":["#"],"block":[]}},"meta":"tsk-2 --dep tsk-1 --descr \"Task1\"","pi":{"args":["bash","tsk-2","--dep","tsk-1","--descr","Task1"],"pos":["tsk-2","dep","descr"],"flags":{"tsk-2":true,"dep":"tsk-1","descr":"Task1"},"count":6,"posCount":3},"cmdLang":"bash","cli":"bash tsk-2 --dep tsk-1 --descr \"Task1\"","fromPresets":[]}}
+      nature: "EXECUTABLE"
+      isActionableCodeCandidate: true
+      spawnableIdentity: "tsk-2"
+      language: {"id":"shell","aliases":["bash","sh","zsh"],"extensions":[".sh",".bash",".zsh"],"shebangs":["bash","sh","zsh"],"comment":{"line":["#"],"block":[]}}
+      spawnableArgs: {"description":"Task1","deps":["tsk-1"],"graphs":[],"injectedDep":[]}
+      memoizeOnly: false
+
 ```
-
----
-
-## Summary
-
-<Callout type="info">
-Spry uses AST (mdast) to power:
-
-- Runbook execution
-- Transformations
-- Documentation introspection
-- DAG-based workflows
-
-The `./spry.ts mdast` command family allows you to deeply inspect and interact with AST structures.
-</Callout>
-
 ---
 
 <Callout>

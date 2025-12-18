@@ -3,9 +3,7 @@
   "icon": "Zap",
   "pages": [
     "best-practices",
-    "troubleshooting",
-    "rb",
-    "rb-new"
+    "troubleshooting"
   ],
   "root": true
 }

@@ -238,7 +238,7 @@ But branching is allowed if defined.
 ##### Basic Execution
 
 ```bash
-spry rb run --md Spryfile.md
+spry rb run Spryfile.md
 ```
 
 **Explanation:**  
@@ -251,7 +251,7 @@ Executes every cell found in `Spryfile.md` based on dependency ordering. Useful 
 **CLI Command:**
 
 ```bash
-spry rb run --md Spryfile.md --visualize ascii-tree
+spry rb run Spryfile.md --visualize ascii-tree
 ```
 
 **Example Task:**
@@ -295,7 +295,7 @@ Other visualization styles:
 ##### Mermaid Diagram Output
 
 ```bash
-spry rb run --md Spryfile.md --visualize mermaid-js > dag.mmd
+spry rb run Spryfile.md --visualize mermaid-js > dag.mmd
 ```
 
 **Explanation:**  
@@ -307,7 +307,7 @@ Paste `dag.mmd` directly into docs to automatically render graphs.
 ##### Verbose Execution
 
 ```bash
-spry rb run --md Spryfile.md --verbose markdown
+spry rb run Spryfile.md --verbose markdown
 ```
 
 **Explanation:**  
@@ -324,7 +324,7 @@ This is ideal for step-by-step walkthroughs and debugging.
 ##### JSON Summary
 
 ```bash
-spry rb run --md Spryfile.md --summarize > run-summary.json
+spry rb run Spryfile.md --summarize > run-summary.json
 ```
 
 **Explanation:**  

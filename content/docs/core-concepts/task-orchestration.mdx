@@ -86,7 +86,7 @@ Skipping dependent tasks: seed-data, deploy
 Execute a single task and its dependencies:
 
 ```bash
-./spry.ts task deploy
+spry rb task deploy
 ```
 
 ### Run All Tasks
@@ -94,24 +94,9 @@ Execute a single task and its dependencies:
 Execute all tasks in the Spryfile:
 
 ```bash
-./spry.ts runbook
+spry rb run
 ```
 
 <Callout type="warn">
-⚠️ **Warning:** Circular dependencies are not allowed and will cause an error during DAG construction.
+**Warning:** Circular dependencies are not allowed and will cause an error during DAG construction.
 </Callout>
-
-## Next Steps
-
-<Cards>
-  <Card 
-    title="Executable Markdown" 
-    href="/docs/core-concepts/executable-markdown"
-    description="Learn how to transform code blocks into executable cells with powerful directives"
-  />
-  <Card 
-    title="SQLPage Integration" 
-    href="/docs/core-concepts/sql-page-integration"
-    description="Discover how Spry generates and manages SQLPage applications"
-  />
-</Cards>

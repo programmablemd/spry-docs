@@ -88,7 +88,7 @@ Here is a real Spryfile that builds a TypeScript project:
 ````markdown
 # Build Pipeline
 
-This document defines our build process. Run it with `./spry.ts task run build`.
+This document defines our build process. Run it with `spry rb task build`.
 
 ## Code Quality
 
@@ -129,7 +129,7 @@ Let's break down the fence header `bash lint --dep format --descr "Lint after fo
 
 ## The Execution Model
 
-When you run `./spry.ts task run build`, here is what happens internally:
+When you run `spry rb task build`, here is what happens internally:
 
 ```text
 1. Parse Markdown          → Extract all fenced code blocks
@@ -240,7 +240,7 @@ npm run dev
 ```
 ````
 
-Now someone can run `./spry.ts task run dev` and either:
+Now someone can run `spry rb task dev` and either:
 
 - It works, confirming the docs are accurate
 - It fails, immediately revealing documentation drift

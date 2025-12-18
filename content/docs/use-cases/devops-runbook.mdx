@@ -163,10 +163,10 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
 
     ```bash
     # List all tasks and their dependencies
-    ./spry.ts rb ls deployment-runbook.md
+    spry rb ls deployment-runbook.md
 
     # Visualize the DAG
-    ./spry.ts rb run deployment-runbook.md --visualize plain
+    spry rb run deployment-runbook.md --visualize plain
     ```
 
     **Example Output:**
@@ -189,7 +189,7 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
       <Tab value="Full Pipeline">
         ```bash
         # Execute all tasks in dependency order
-        ./spry.ts rb run deployment-runbook.md --verbose rich
+        spry rb run deployment-runbook.md --verbose rich
         ```
 
         This runs the entire pipeline with rich progress output, stopping on any error.
@@ -198,7 +198,7 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
       <Tab value="Specific Task">
         ```bash
         # Run only the deploy task (and its dependencies)
-        ./spry.ts rb task deploy deployment-runbook.md
+        spry rb task deploy deployment-runbook.md
         ```
 
         This executes only `deploy` and any tasks it depends on.
@@ -207,7 +207,7 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
       <Tab value="With Summary">
         ```bash
         # Execute with concise summary
-        ./spry.ts rb run deployment-runbook.md --summarize
+        spry rb run deployment-runbook.md --summarize
         ```
 
         Shows a summary of task execution with success/failure indicators.
@@ -222,7 +222,7 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
 
     ```bash
     # Manual rollback
-    ./spry.ts rb task rollback deployment-runbook.md
+    spry rb task rollback deployment-runbook.md
     ```
 
     <Callout type="warning">
@@ -243,13 +243,13 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
 
     ```bash
     # Development
-    ENV=dev ./spry.ts rb run deployment-runbook.md
+    ENV=dev spry rb run deployment-runbook.md
 
     # Staging
-    ENV=staging ./spry.ts rb run deployment-runbook.md
+    ENV=staging spry rb run deployment-runbook.md
 
     # Production
-    ENV=production ./spry.ts rb run deployment-runbook.md
+    ENV=production spry rb run deployment-runbook.md
     ```
 
     In your runbook:

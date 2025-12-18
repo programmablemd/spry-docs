@@ -12,7 +12,8 @@
     "environment-variables",
     "common-workflows",
     "dag",
-    "ast"
+    "ast",
+    "architecture-pattern-edge-engineering"
   ],
   "root": true
 }

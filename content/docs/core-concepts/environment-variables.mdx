@@ -101,7 +101,7 @@ Spry also allows running the environment setup through a task defined in your Sp
 If your Spry configuration includes a task named `env`, you can execute it as follows:
 
 ```bash
-./spry.ts task env
+spry rb task env
 ```
 
 This command internally runs the equivalent of:
@@ -128,7 +128,7 @@ to authorize `direnv` to load the variables defined in `.envrc`.
 | Method | Description | Usage |
 |--------|-------------|--------|
 | **Manual** | Create `.envrc` manually, then enable it with `direnv allow`. | `cat > .envrc ...` then `direnv allow` |
-| **Recommended: Task-based** | Automates the recommended command using a Spry task. | `./spry.ts task env` then `direnv allow` |
+| **Recommended: Task-based** | Automates the recommended command using a Spry task. | `spry rb task env` then `direnv allow` |
 
 ---
 

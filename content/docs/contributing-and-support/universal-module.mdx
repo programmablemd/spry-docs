@@ -731,8 +731,8 @@ await run(true);
 
 Don't hardcode console.log in your logic - emit events instead:
 
-<Tabs items={['❌ Bad', '✅ Good']}>
-<Tab value="❌ Bad">
+<Tabs items={['Bad', 'Good']}>
+<Tab value="Bad">
 ```typescript
 // Tight coupling
 function runTask() {
@@ -743,7 +743,7 @@ function runTask() {
 ```
 </Tab>
 
-<Tab value="✅ Good">
+<Tab value="Good">
 ```typescript
 // Use event bus
 function runTask(bus: EventBus) {
@@ -762,7 +762,7 @@ function runTask(bus: EventBus) {
 Use TypeScript's type system with the event bus:
 
 ```typescript
-// ✅ Define event types upfront
+// Define event types upfront
 type Events = {
   "build:start": { target: string };
   "build:done": { target: string; artifacts: string[] };
@@ -779,7 +779,7 @@ const bus = eventBus<Events>();
 Don't rebuild execution plans unnecessarily:
 
 ```typescript
-// ✅ Build once, reuse
+// Build once, reuse
 const plan = executionPlan(tasks);
 
 // Execute multiple times
@@ -808,7 +808,7 @@ if (result.code !== 0) {
 Prevent excessive rebuilds with appropriate debounce times:
 
 ```typescript
-// ✅ 100-500ms is usually good
+// 100-500ms is usually good
 const run = watcher(files, rebuild, { debounceMs: 200 });
 ```
 
@@ -915,10 +915,4 @@ The universal module is the backbone of Spry, providing battle-tested primitives
 - Terminal UI components for tables and trees
 - File system utilities and content loading
 - System diagnostics and health checks
-</Callout>
-
----
-
-<Callout>
-This comprehensive module provides everything you need to build powerful CLI tools, build systems, and automation workflows in Spry.
 </Callout>

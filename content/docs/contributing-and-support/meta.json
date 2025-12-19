@@ -13,7 +13,8 @@
     "universal-module",
     "custom-extensions",
     "spry-start",
-    "api-doc"
+    "api-doc",
+    "faq"
   ],
   "root": true
 }

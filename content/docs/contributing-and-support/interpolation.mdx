@@ -55,10 +55,10 @@ Choosing between safe and unsafe interpolation is about **trust and capability**
 
 | Aspect | Safe | Unsafe |
 |--------|------|--------|
-| **Code execution** | ✅ No eval, no Function() | ❌ Full JavaScript execution |
+| **Code execution** | No eval, no Function() | Full JavaScript execution |
 | **Use case** | Config files, user input, environment vars | Trusted templates, complex logic |
-| **Performance** | ⚡ Fast (no compilation) | 🐌 Slower (compiles JS) |
-| **Security** | 🔒 High (no injection risk) | ⚠️ Requires trusted input |
+| **Performance** | Fast (no compilation) | Slower (compiles JS) |
+| **Security** | High (no injection risk) | Requires trusted input |
 | **Expressions** | Mini language (paths, functions) | Full JavaScript |
 | **When to use** | Default choice, external input | Internal templates only |
 
@@ -293,15 +293,15 @@ Unsafe mode executes **full JavaScript** within templates. Use only with trusted
 
 #### When to Use Unsafe Mode
 
-<Tabs items={['✅ Good Use Cases', '❌ Bad Use Cases']}>
-<Tab value="✅ Good Use Cases">
+<Tabs items={['Good Use Cases', 'Bad Use Cases']}>
+<Tab value="Good Use Cases">
 - Internal configuration templates you control
 - Complex calculations requiring JavaScript
 - Dynamic SQL generation from trusted sources
 - Build-time code generation
 </Tab>
 
-<Tab value="❌ Bad Use Cases">
+<Tab value="Bad Use Cases">
 - User-provided templates
 - External configuration files
 - Any untrusted input
@@ -888,8 +888,8 @@ const output = await renderCell(cell, interpolationContext);
 
 ### 1. Choose the Right Mode
 
-<Tabs items={['✅ Good', '❌ Bad']}>
-<Tab value="✅ Good">
+<Tabs items={['Good', 'Bad']}>
+<Tab value="Good">
 ```typescript
 // Safe for user input
 const userGreeting = safeInterpolate(
@@ -899,7 +899,7 @@ const userGreeting = safeInterpolate(
 ```
 </Tab>
 
-<Tab value="❌ Bad">
+<Tab value="Bad">
 ```typescript
 // Unsafe with user input
 const unsafe = unsafeInterpolator({});
@@ -913,8 +913,8 @@ await unsafe.interpolate(
 
 ### 2. Validate with Schemas
 
-<Tabs items={['✅ Good', '❌ Bad']}>
-<Tab value="✅ Good">
+<Tabs items={['Good', 'Bad']}>
+<Tab value="Good">
 ```typescript
 // Schema catches errors early
 const query = partialContent(
@@ -925,7 +925,7 @@ const query = partialContent(
 ```
 </Tab>
 
-<Tab value="❌ Bad">
+<Tab value="Bad">
 ```typescript
 // No validation
 const query2 = partialContent(
@@ -938,8 +938,8 @@ const query2 = partialContent(
 
 ### 3. Compile Repeated Templates
 
-<Tabs items={['✅ Good', '❌ Bad']}>
-<Tab value="✅ Good">
+<Tabs items={['Good', 'Bad']}>
+<Tab value="Good">
 ```typescript
 // Compile once, render many times
 const template = compileSafeTemplate("Hello ${name}!");
@@ -949,7 +949,7 @@ for (const user of users) {
 ```
 </Tab>
 
-<Tab value="❌ Bad">
+<Tab value="Bad">
 ```typescript
 // Reparse every time
 for (const user of users) {
@@ -961,8 +961,8 @@ for (const user of users) {
 
 ### 4. Use Partials for Reuse
 
-<Tabs items={['✅ Good', '❌ Bad']}>
-<Tab value="✅ Good">
+<Tabs items={['Good', 'Bad']}>
+<Tab value="Good">
 ```typescript
 // DRY with partials
 const header = partialContent("header", "...");
@@ -971,7 +971,7 @@ const footer = partialContent("footer", "...");
 ```
 </Tab>
 
-<Tab value="❌ Bad">
+<Tab value="Bad">
 ```typescript
 // Copy-paste everywhere
 const page1 = "<!-- header -->" + content1 + "<!-- footer -->";

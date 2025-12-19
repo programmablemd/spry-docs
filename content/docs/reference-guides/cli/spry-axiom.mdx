@@ -67,7 +67,7 @@ spry axiom shebang -h
     
     ```bash
     spry axiom ls
-    spry axiom ls ./runbook.md
+    spry axiom ls ./file.md
     ```
   </Card>
   
@@ -130,19 +130,19 @@ spry axiom web-ui --help
 spry axiom web-ui
 
 # Start Web UI with custom file
-spry axiom web-ui runbook-cmd.md
+spry axiom web-ui spry-cmd.md.md
 
 # Start on custom port
 spry axiom web-ui --port 9090
-spry axiom web-ui runbook-cmd.md --port 9090
+spry axiom web-ui spry-cmd.md.md --port 9090
 
 # Specify network interface
 spry axiom web-ui --listen 127.0.0.1
-spry axiom web-ui runbook-cmd.md --listen 127.0.0.1
+spry axiom web-ui spry-cmd.md.md --listen 127.0.0.1
 
 # Start without opening browser
 spry axiom web-ui --no-open
-spry axiom web-ui runbook-cmd.md --no-open
+spry axiom web-ui spry-cmd.md.md --no-open
 ```
 
 ### 2. `ls` - Browse Document Hierarchy
@@ -175,17 +175,17 @@ spry axiom ls --help
 spry axiom ls
 
 # List headings from custom file
-spry axiom ls runbook-cmd.md
+spry axiom ls spry-cmd.md.md
 
 # Include additional node types
 spry axiom ls -n paragraph
 spry axiom ls --node paragraph
-spry axiom ls runbook-cmd.md -n paragraph
-spry axiom ls runbook-cmd.md --node paragraph
+spry axiom ls spry-cmd.md.md -n paragraph
+spry axiom ls spry-cmd.md.md --node paragraph
 
 # List without colors
 spry axiom ls --no-color
-spry axiom ls runbook-cmd.md --no-color
+spry axiom ls spry-cmd.md.md --no-color
 
 # Combine options
 spry axiom ls -n paragraph --no-color
@@ -230,11 +230,11 @@ spry axiom inspect --help
 spry axiom inspect
 
 # Inspect custom file
-spry axiom inspect runbook-cmd.md
+spry axiom inspect spry-cmd.md.md
 
 # Inspect without colors
 spry axiom inspect --no-color
-spry axiom inspect runbook-cmd.md --no-color
+spry axiom inspect spry-cmd.md.md --no-color
 ```
 
 ### 4. `projection` - Generate JSON Projection
@@ -267,15 +267,15 @@ spry axiom projection --help
 spry axiom projection
 
 # Generate projection from custom file
-spry axiom projection runbook-cmd.md
+spry axiom projection spry-cmd.md.md
 
 # Pretty-print JSON output
 spry axiom projection --pretty
-spry axiom projection runbook-cmd.md --pretty
+spry axiom projection spry-cmd.md.md --pretty
 
 # Generate JSONL (JSON Lines)
 spry axiom projection --jsonl
-spry axiom projection runbook-cmd.md --jsonl
+spry axiom projection spry-cmd.md.md --jsonl
 ```
 
 **Output Formats:**
@@ -313,15 +313,15 @@ spry axiom shebang --help
 spry axiom shebang
 
 # Add shebang to custom file
-spry axiom shebang runbook-cmd.md
+spry axiom shebang spry-cmd.md.md
 
 # Preview without modifying (dry-run)
 spry axiom shebang --dry-run
-spry axiom shebang runbook-cmd.md --dry-run
+spry axiom shebang spry-cmd.md.md --dry-run
 
 # Specify custom entrypoint
 spry axiom shebang --entrypoint ./my-spry-launcher.ts
-spry axiom shebang runbook-cmd.md --entrypoint ./my-spry-launcher.ts
+spry axiom shebang spry-cmd.md.md --entrypoint ./my-spry-launcher.ts
 ```
 
 **Behavior:**
@@ -360,16 +360,16 @@ All commands that accept file paths support:
   <Tab value="Convert to Executable">
     ```bash
     # Preview the shebang that will be added
-    spry axiom shebang ./my-runbook.md --dry-run
+    spry axiom shebang ./my-file.md --dry-run
 
     # Add shebang to make it executable
-    spry axiom shebang ./my-runbook.md
+    spry axiom shebang ./my-file.md
 
     # With custom entrypoint
-    spry axiom shebang ./my-runbook.md --entrypoint ./custom-launcher.ts
+    spry axiom shebang ./my-file.md --entrypoint ./custom-launcher.ts
 
     # Now the file can be executed directly
-    ./my-runbook.md
+    ./my-file.md
     ```
   </Tab>
 </Tabs>

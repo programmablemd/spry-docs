@@ -39,7 +39,7 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
 
     ## Pre-Flight Checks
 
-    \`\`\`bash check-git-status --descr "Verify clean git working directory"
+    ```bash check-git-status --descr "Verify clean git working directory"
     #!/usr/bin/env -S bash
     set -e
 
@@ -50,9 +50,9 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
     fi
 
     echo "OK: Git working directory is clean"
-    \`\`\`
+    ```
 
-    \`\`\`bash check-tests --descr "Run test suite" --dep check-git-status
+    ```bash check-tests --descr "Run test suite" --dep check-git-status
     #!/usr/bin/env -S bash
     set -e
 
@@ -65,11 +65,11 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
       echo "ERROR: Tests failed"
       exit 1
     fi
-    \`\`\`
+    ```
 
     ## Build Phase
 
-    \`\`\`bash build-app --descr "Build production artifacts" --dep check-tests
+    ```bash build-app --descr "Build production artifacts" --dep check-tests
     #!/usr/bin/env -S bash
     set -e
 
@@ -78,11 +78,11 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
 
     echo "OK: Build completed successfully"
     ls -la dist/
-    \`\`\`
+    ```
 
     ## Health Check
 
-    \`\`\`bash health-check --descr "Verify server health"
+    ```bash health-check --descr "Verify server health"
     #!/usr/bin/env -S bash
     set -e
 
@@ -98,11 +98,11 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
       echo "ERROR: Server health check failed (HTTP $response)"
       exit 1
     fi
-    \`\`\`
+    ```
 
     ## Deployment
 
-    \`\`\`bash deploy --descr "Deploy to production" --dep build-app,health-check
+    ```bash deploy --descr "Deploy to production" --dep build-app,health-check
     #!/usr/bin/env -S bash
     set -e
 
@@ -115,11 +115,11 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
     ssh user@server 'systemctl restart app'
 
     echo "OK: Deployment completed"
-    \`\`\`
+    ```
 
     ## Post-Deployment Verification
 
-    \`\`\`bash verify-deployment --descr "Verify deployment success" --dep deploy
+    ```bash verify-deployment --descr "Verify deployment success" --dep deploy
     #!/usr/bin/env -S bash
     set -e
 
@@ -134,11 +134,11 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
       echo "ERROR: Post-deployment verification failed"
       exit 1
     fi
-    \`\`\`
+    ```
 
     ## Rollback (Manual)
 
-    \`\`\`bash rollback --descr "Rollback to previous version"
+    ```bash rollback --descr "Rollback to previous version"
     #!/usr/bin/env -S bash
     set -e
 
@@ -146,7 +146,7 @@ Executable runbooks capture DevOps procedures as code, making them testable, ver
     ssh user@server 'cd /var/www/app && git checkout HEAD~1 && systemctl restart app'
 
     echo "Rollback completed"
-    \`\`\`
+    ```
     ````
 
     <Callout>

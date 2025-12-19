@@ -47,7 +47,7 @@ By embedding tests directly in documentation, you ensure evidence collection is 
 
     ## Test Steps
 
-    \`\`\`bash tc001-check-access --descr "Verify access controls are in place"
+    ```bash tc001-check-access --descr "Verify access controls are in place"
     #!/usr/bin/env -S bash
     set -e
 
@@ -63,11 +63,11 @@ By embedding tests directly in documentation, you ensure evidence collection is 
     done
 
     echo "PASS: All current users are authorized"
-    \`\`\`
+    ```
 
     ## Evidence Artifacts
 
-    \`\`\`bash tc001-capture-evidence -C ./evidence/tc001-results.json --gitignore
+    ```bash tc001-capture-evidence -C ./evidence/tc001-results.json --gitignore
     #!/usr/bin/env -S bash
     cat << EOF
     {
@@ -78,7 +78,7 @@ By embedding tests directly in documentation, you ensure evidence collection is 
       "currentUserCount": $(who | wc -l)
     }
     EOF
-    \`\`\`
+    ```
 
     ## Results
 

@@ -616,11 +616,11 @@ for (const task of tasks) {
 - Automation pipelines
 
 <Cards>
-  <Card title="FlexibleProjection" icon="Database">
+  <Card title="FlexibleProjection">
     Best for document analysis, querying, and building custom tools
   </Card>
   
-  <Card title="PlaybookProjection" icon="Play">
+  <Card title="PlaybookProjection">
     Best for executing tasks, running workflows, and automation
   </Card>
 </Cards>
@@ -630,19 +630,19 @@ for (const task of tasks) {
 ### Rule Design
 
 <Cards>
-  <Card title="Pass Through Edges" icon="ArrowRight">
+  <Card title="Pass Through Edges">
     Always yield previous edges unless you're intentionally filtering
   </Card>
   
-  <Card title="Use Generators" icon="Zap">
+  <Card title="Use Generators">
     Generators are memory-efficient and support lazy evaluation
   </Card>
   
-  <Card title="Single Responsibility" icon="Target">
+  <Card title="Single Responsibility">
     Each rule should focus on one type of relationship
   </Card>
   
-  <Card title="Document Semantics" icon="BookOpen">
+  <Card title="Document Semantics">
     Clearly document what relationships mean and when they're created
   </Card>
 </Cards>
@@ -765,29 +765,3 @@ Let's build a complete custom rule that creates dependency edges between tasks:
     ```
   </Step>
 </Steps>
-
-## Next Steps
-
-<Cards>
-  <Card title="Architecture Guide" href="/docs/architecture">
-    Understand how Axiom fits into Spry's overall architecture
-  </Card>
-  
-  <Card title="Code Cells" href="/docs/core-concepts/code-cells">
-    Learn how code cells are processed and executed
-  </Card>
-  
-  <Card title="Task Dependencies" href="/docs/core-concepts/task-dependencies">
-    Master dependency management and execution ordering
-  </Card>
-  
-  <Card title="Projections" href="/docs/reference/projections">
-    Deep dive into different projection types
-  </Card>
-</Cards>
-
-<Callout type="success">
-**You're Ready to Build Custom Rules**
-
-With Axiom's flexible rule system, you can add any semantic relationships you need. Start with the built-in rules, then extend them for your domain-specific requirements.
-</Callout>

@@ -4,7 +4,8 @@
   "pages": [
     "audit-complains",
     "sqlpage-data-app",
-    "devops-runbook"
+    "devops-runbook",
+    "quality-testcase-template"
   ],
   "root": true
 }

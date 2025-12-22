@@ -107,13 +107,13 @@ SELECT 'card' AS component, 'Welcome' AS title;
 <Tabs items={['Development', 'Production']}>
   <Tab value="Development">
     ```bash
-    ./spry.ts sp spc --fs dev-src.auto --conf sqlpage/sqlpage.json
+    spry sp spc --fs dev-src.auto --conf sqlpage/sqlpage.json
     ```
   </Tab>
   
   <Tab value="Production">
     ```bash
-    ./spry.ts sp spc --package | sqlite3 app.db
+    spry sp spc --package | sqlite3 app.db
     ```
   </Tab>
 </Tabs>
@@ -153,13 +153,13 @@ runbook:
 
 ```bash
 # List all tasks
-./spry.ts rb ls
+spry rb ls
 
 # Run with verbose output
-./spry.ts rb run --verbose rich
+spry rb run --verbose rich
 
 # Run specific task
-./spry.ts rb task deploy
+spry rb task deploy
 ```
 
 ### Data Quality Playbook

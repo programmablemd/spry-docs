@@ -6,7 +6,6 @@
     "spry-help",
     "code-contributor-guide",
     "architecture-deep-drive",
-    "plugin-development-guide",
     "axiom-api",
     "interpolation",
     "reflect-module",
@@ -14,6 +13,7 @@
     "custom-extensions",
     "spry-start",
     "api-doc",
+    "faq",
     "playbook"
   ],
   "root": true

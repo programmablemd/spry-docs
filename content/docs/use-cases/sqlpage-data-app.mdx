@@ -1,6 +1,6 @@
 ---
-title: Building a Data Application (SQLPage)
-description: Create SQLite-backed dashboard applications with SQLPage
+title: Data-Driven Operational Dashboard (SQLPage)
+description: Create SQLite-backed dashboard applications with SQLPage and Surveilr
 icon: Database
 index: 2
 ---
@@ -9,244 +9,111 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { Steps, Step } from 'fumadocs-ui/components/steps';
 
-## Recipe 2: Building a Data Application (SQLPage)
 
-**Goal:** Create a SQLite-backed dashboard application using SQLPage - no JavaScript framework required, just SQL and Markdown.
-
-<Callout type="info">
-**SQLPage Benefits**
-
-SQLPage lets you build full-featured web applications using only SQL queries. Combined with Spry, you get version control, templating, and deployment automation.
-</Callout>
+**Goal:** Build a robust, SQL-driven dashboard where the schema is managed as a separate asset and executed via the `surveilr` engine.
 
 <Steps>
   <Step>
-    ## Initialize the Project
+    ## Initialize and Configure
     
-    Create a new SQLPage project with Spry:
+    Set up your environment. We use `${env.SPRY_DB}` to ensure flexibility between local development and production environments.
 
     ```bash
-    mkdir sales-dashboard && cd sales-dashboard
-    deno run --node-modules-dir=auto -A \
-      https://raw.githubusercontent.com/programmablemd/spry/main/lib/playbook/sqlpage/cli.ts init
+    spry sp init
     ```
 
-    This creates:
-    - `spry.ts` - CLI wrapper
-    - `Spryfile.md` - Application definition (we'll customize this)
-    - `sqlpage/sqlpage.json` - SQLPage configuration
-    - `import_map.json` - Deno imports
-  </Step>
-
-  <Step>
-    ## Define Your Application in Spryfile.md
-    
-    Replace the contents of `Spryfile.md`:
-
-    ````markdown
-    ---
-    sqlpage-conf:
-      database_url: ${env.SPRY_DB}
-      web_root: ./dev-src.auto
-      port: ${env.PORT}
-      allow_exec: true
-    ---
-
-    # Sales Dashboard Application
-
-    ## Environment Setup
-
-    ```envrc prepare-env -C ./.envrc --gitignore
+    ```bash prepare-env -C ./.envrc --gitignore
     export SPRY_DB="sqlite://sales.db?mode=rwc"
     export PORT=9227
     ```
+  </Step>
 
-    ## Database Schema
+  <Step>
+    ## Orchestrate Database with Surveilr
+    
+    Instead of embedding long SQL strings in Markdown, we use `surveilr` to execute the external [sales.sql](/sales.sql) file. This keeps our runbook clean.
 
-    ```bash prepare-db --descr "Create the sales database"
+    ```bash prepare-db --descr "Initialize Sales Database via Surveilr"
     #!/usr/bin/env -S bash
-    rm -f sales.db
-    sqlite3 sales.db << 'SQL'
-    CREATE TABLE sales (
-      id INTEGER PRIMARY KEY,
-      product TEXT NOT NULL,
-      amount DECIMAL(10,2) NOT NULL,
-      sale_date DATE NOT NULL,
-      region TEXT NOT NULL
-    );
-
-    INSERT INTO sales (product, amount, sale_date, region) VALUES
-      ('Widget A', 150.00, '2025-01-01', 'North'),
-      ('Widget B', 250.00, '2025-01-02', 'South'),
-      ('Widget A', 175.00, '2025-01-03', 'East'),
-      ('Widget C', 300.00, '2025-01-04', 'West'),
-      ('Widget B', 225.00, '2025-01-05', 'North');
-    SQL
+    # Initialize the sqlite db
+    surveilr admin init -d sales.sqlite.db
+    # Execute the external schema file using the surveilr shell
+    surveilr shell sales.sql -d sales.sqlite.db
     ```
+    <Callout type="info">
+    **Why Surveilr?**
+    Unlike standard SQLite, `surveilr` provides a unified resource database environment, making it easier to scale from a simple table to a complex "Mesh" of system data.
+    </Callout>
+  </Step>
 
-    ## Application Layout
+  <Step>
+    ## Define the Global UI Shell
+    
+    Inject a consistent navigation and layout into every page of the application automatically.
 
     ```sql PARTIAL global-layout.sql --inject **/*
     SELECT 'shell' AS component,
-           'Sales Dashboard' AS title,
-           'chart' AS icon,
-           'fluid' AS layout,
+           'Sales Intelligence' AS title,
+           'chart-bar' AS icon,
            'index.sql' AS link,
            '{"link":"/index.sql","title":"Home"}' AS menu_item,
-           '{"link":"/sales.sql","title":"Sales"}' AS menu_item,
-           '{"link":"/regions.sql","title":"Regions"}' AS menu_item;
+           '{"link":"/report.sql","title":"Sales Report"}' AS menu_item;
     ```
-
-    ## Home Page
-
-    ```sql index.sql { route: { caption: "Home" } }
-    SELECT 'card' AS component,
-           'Sales Dashboard' AS title,
-           2 AS columns;
-
-    SELECT 'Total Sales' AS title,
-           '$' || SUM(amount) AS description
-    FROM sales;
-
-    SELECT 'Total Transactions' AS title,
-           COUNT(*) || ' orders' AS description
-    FROM sales;
-    ```
-
-    ## Sales Report
-
-    ```sql sales.sql { route: { caption: "Sales Report" } }
-    SELECT 'text' AS component,
-           'Sales Report' AS title;
-
-    SELECT 'table' AS component,
-           TRUE AS sort,
-           TRUE AS search;
-
-    SELECT
-      product AS "Product",
-      '$' || amount AS "Amount",
-      sale_date AS "Date",
-      region AS "Region"
-    FROM sales
-    ORDER BY sale_date DESC;
-    ```
-
-    ## Regional Summary
-
-    ```sql regions.sql { route: { caption: "By Region", description: "Sales breakdown by region" } }
-    SELECT 'text' AS component,
-           'Sales by Region' AS title;
-
-    SELECT 'chart' AS component,
-           'bar' AS type,
-           'Region' AS xtitle,
-           'Total Sales' AS ytitle;
-
-    SELECT
-      region AS x,
-      SUM(amount) AS y
-    FROM sales
-    GROUP BY region
-    ORDER BY SUM(amount) DESC;
-    ```
-    ````
-
-    <Callout>
-    **PARTIAL Directive**
-
-    The `PARTIAL global-layout.sql --inject **/*` automatically injects the navigation shell into every SQL page, ensuring consistent layout across your application.
-    </Callout>
   </Step>
 
   <Step>
-    ## Build and Run
+    ## The Dashboard (index.sql)
     
-    Execute the setup and start the application:
+    The dashboard consumes the data defined in `sales.sql`.
+
+    ```sql index.sql { route: { caption: "Overview" } }
+    -- Card Metrics
+    SELECT 'card' AS component, 3 AS columns;
+    SELECT 'Total Revenue' AS title, '$' || SUM(amount) AS description, 'green' as color FROM sales;
+    SELECT 'Regional Markets' AS title, COUNT(DISTINCT region) AS description, 'blue' as color FROM sales;
+    SELECT 'Latest Order' AS title, product AS description FROM sales ORDER BY sale_date DESC LIMIT 1;
+
+    -- Visual Analytics
+    SELECT 'chart' AS component, 'Revenue by Region' AS title, 'bar' AS type;
+    SELECT region AS x, SUM(amount) AS y FROM sales GROUP BY region;
+    ```
+  </Step>
+
+  <Step>
+    ## Execute and Deploy
+    
+    Execute the database preparation task and start the live-reload development server.
 
     ```bash
-    # Set up environment
-    source .envrc  # or use direnv
+    # 1. Set the ENV defined in Step 1
+    spry rb task prepare-env
 
-    # Prepare the database
+    # 2. Run the DB task defined in Step 2
     spry rb task prepare-db
 
-    # Build the SQLPage site
-    spry sp spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json
-
-    # Start SQLPage server
-    sqlpage
+    # 3. Launch Development Server
+    spry sp spc --fs dev-src.auto --destroy-first --conf sqlpage/sqlpage.json --watch --with-sqlpage
     ```
-
-    Visit `http://localhost:9227` to see your dashboard!
-
-    <Callout type="success">
-    **Your Dashboard is Live**
-
-    You should see a fully functional dashboard with navigation, cards showing sales metrics, an interactive table, and a bar chart.
-    </Callout>
   </Step>
-
   <Step>
-    ## Development with Live Reload
-    
-    For active development with automatic rebuilding:
+
+    ## Package the Application
+    Combine your UI components, business logic, and database schema into a single, portable binary artifact. We use surveilr here to ensure the internal sqlpage_files table is correctly populated.
 
     ```bash
-    spry sp spc --fs dev-src.auto --destroy-first \
-      --conf sqlpage/sqlpage.json --watch --with-sqlpage
+    # Package the UI and inject it into the production database
+    spry sp spc --package --conf sqlpage/sqlpage.json | surveilr shell sales.sqlite.db
     ```
 
-    Now any changes to `Spryfile.md` will automatically:
-    - Rebuild the SQL files
-    - Restart the SQLPage server
-    - Reflect in your browser (after refresh)
   </Step>
 
-  <Step>
-    ## Deploy to Production
-    
-    Package everything into the database for deployment:
-
-    ```bash
-    spry sp spc --package --conf sqlpage/sqlpage.json | sqlite3 sales.db
-    ```
-
-    This stores all SQL files in the `sqlpage_files` table within `sales.db`.
-
-    **Deploy:**
-    ```bash
-    # Copy the single database file to production
-    scp sales.db user@server:/opt/app/
-
-    # On the server, just run SQLPage
-    cd /opt/app && sqlpage
-    ```
-
-    <Callout type="info">
-    **Self-Contained Deployment**
-
-    Your entire application - schema, data, and pages - lives in a single SQLite file. This makes deployment, backup, and distribution incredibly simple.
-    </Callout>
-  </Step>
 </Steps>
 
-## Customization Ideas
-
 <Cards>
-  <Card title="Add Authentication">
-    Use SQLPage's authentication components to add login and user sessions
+  <Card title="View Schema" href="/sales.sql">
+    Access the raw SQL definition for the database.
   </Card>
-  
-  <Card title="Real-Time Updates">
-    Add auto-refresh with meta tags or HTMX for live dashboards
-  </Card>
-  
-  <Card title="Export Features">
-    Add CSV/PDF export buttons using SQLPage's file generation
-  </Card>
-  
-  <Card title="Multi-Tenant">
-    Add tenant filtering in queries for SaaS applications
+  <Card title="Operational Runbook">
+    Learn how to add health checks to this application using `spry rb`.
   </Card>
 </Cards>

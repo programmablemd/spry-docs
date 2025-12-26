@@ -4,106 +4,114 @@ description: How to contribute to Spry and help improve the project
 icon: Code
 ---
 
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
-import { Card, Cards } from 'fumadocs-ui/components/card';
-import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
-import { Steps, Step } from 'fumadocs-ui/components/steps';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-# Contributing Guide
+## TypeScript Style
 
-Welcome to Spry! We're excited that you want to contribute. This guide covers code standards, testing practices, and contribution workflows.
+### General Principles
 
-## Before You Start
+- Use TypeScript's type system fully
+- Prefer immutability
+- Write self-documenting code
+- Keep functions small and focused
 
-- Browse [existing issues](https://github.com/programmablemd/spry/issues) and [pull requests](https://github.com/programmablemd/spry/pulls)
-- Check issues labeled `good first issue` if you're new to the project
-- Review the [Development Setup](/docs) guide
+### Naming Conventions
 
-<Callout type="warn">
-**Security Issues**
+<Tabs items={['Files', 'Types', 'Functions', 'Constants']}>
+  <Tab value="Files">
+    ```typescript
+    // Files: kebab-case
+    // contained-in-section.ts
+    // code-frontmatter.ts
+    ```
+  </Tab>
+  <Tab value="Types">
+    ```typescript
+    // Types/Interfaces: PascalCase
+    interface GraphEdge { ... }
+    type ExecutableTask = ...
+    ```
+  </Tab>
+  <Tab value="Functions">
+    ```typescript
+    // Functions/Variables: camelCase
+    function buildGraph() { ... }
+    const taskRunner = ...
+    ```
+  </Tab>
+  <Tab value="Constants">
+    ```typescript
+    // Constants: UPPER_SNAKE_CASE or camelCase
+    const DEFAULT_TIMEOUT = 120;
+    const typicalRules = [...];
+    ```
+  </Tab>
+</Tabs>
 
-Email maintainers directly instead of creating public issues for security vulnerabilities.
-</Callout>
-
-## Types of Contributions
-
-<Cards>
-  <Card title="Bug Reports">
-    Report issues with clear reproduction steps, expected vs actual behavior, and environment details.
-  </Card>
-  
-  <Card title="Feature Requests">
-    Propose features with use cases, examples, and considered alternatives.
-  </Card>
-  
-  <Card title="Code">
-    Submit bug fixes, features, performance improvements, or tests.
-  </Card>
-  
-  <Card title="Documentation">
-    Improve guides, API docs, examples, or fix clarity issues.
-  </Card>
-</Cards>
-
-## Code Standards
-
-### TypeScript Style
-
-#### Naming Conventions
-
-```typescript
-// Files: kebab-case
-// contained-in-section.ts, code-frontmatter.ts
-
-// Types/Interfaces: PascalCase
-interface GraphEdge { ... }
-type ExecutableTask = ...
-
-// Functions/Variables: camelCase
-function buildGraph() { ... }
-const taskRunner = ...
-
-// Constants: UPPER_SNAKE_CASE or camelCase
-const DEFAULT_TIMEOUT = 120;
-const typicalRules = [...];
-```
-
-#### Type Annotations
+### Type Annotations
 
 ```typescript
-// Explicit return types for public functions
+// Prefer explicit return types for public functions
 function parseCell(code: Code): ParsedCell {
   // ...
 }
 
-// Infer types for local variables
-const result = parseCell(node);
+// Use type inference for local variables
+const result = parseCell(node);  // Type is inferred
 
-// Use unknown instead of any
+// Avoid `any` - use `unknown` if type is truly unknown
 function processUnknown(value: unknown): void {
   if (typeof value === "string") {
-    // Type narrowing
+    // Now TypeScript knows it's a string
   }
 }
 ```
 
-#### Import Organization
+<Callout type="warn">
+Avoid using `any` type. Use `unknown` when the type is truly unknown and perform type guards.
+</Callout>
+
+### Import Organization
+
+<Steps>
+<Step>
+**Standard library imports**
 
 ```typescript
-// 1. Standard library
 import { join } from "std/path/mod.ts";
+```
+</Step>
 
-// 2. External dependencies
+<Step>
+**External dependencies**
+
+```typescript
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
+```
+</Step>
 
-// 3. Internal absolute imports
+<Step>
+**Internal absolute imports**
+
+```typescript
 import { graph } from "@spry/axiom/graph.ts";
+```
+</Step>
 
-// 4. Relative imports
+<Step>
+**Relative imports**
+
+```typescript
 import { helper } from "./helper.ts";
 import type { MyType } from "./types.ts";
 ```
+</Step>
+</Steps>
+
+## Code Organization
 
 ### Module Structure
 
@@ -126,32 +134,42 @@ export function mainFunction() { ... }
 export class MainClass { ... }
 ```
 
+### File Size
+
+- Keep files under 300 lines when possible
+- Split large files into focused modules
+- One primary export per file
+
 ### Function Design
 
-Keep functions small and focused:
-
-```typescript
-// Good: Small, focused functions
-function validateTask(task: Task): ValidationResult {
-  const errors = [];
-  if (!task.taskId()) errors.push("Missing task ID");
-  if (task.taskDeps()?.some(d => !isValidId(d))) {
-    errors.push("Invalid dependency");
-  }
-  return { valid: errors.length === 0, errors };
-}
-```
-
-**Guidelines:**
-- Keep files under 300 lines when possible
-- One primary export per file
-- Split large functions into testable units
+<Tabs items={['Good', 'Avoid']}>
+  <Tab value="Good">
+    ```typescript
+    // Good: Small, focused functions
+    function validateTask(task: Task): ValidationResult {
+      const errors = [];
+      if (!task.taskId()) errors.push("Missing task ID");
+      if (task.taskDeps()?.some(d => !isValidId(d))) {
+        errors.push("Invalid dependency");
+      }
+      return { valid: errors.length === 0, errors };
+    }
+    ```
+  </Tab>
+  <Tab value="Avoid">
+    ```typescript
+    // Avoid: Large functions doing multiple things
+    // Split into smaller, testable functions
+    ```
+  </Tab>
+</Tabs>
 
 ## Error Handling
 
-### Result Types for Expected Failures
+### Use Result Types
 
 ```typescript
+// Prefer Result types over exceptions for expected failures
 type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 function parseConfig(content: string): Result<Config, ParseError> {
@@ -164,111 +182,61 @@ function parseConfig(content: string): Result<Config, ParseError> {
 }
 ```
 
+<Callout>
+Prefer Result types over exceptions for expected failures to make error handling explicit.
+</Callout>
+
 ### Exceptions for Unexpected Errors
 
 ```typescript
-// Programming errors
+// Use exceptions for programming errors
 function assertNever(value: never): never {
   throw new Error(`Unexpected value: ${value}`);
 }
 
-// Input validation at boundaries
+// Validate inputs at boundaries
 function processFile(path: string): void {
   if (!path) throw new Error("Path is required");
   // ...
 }
 ```
 
-## Testing Guidelines
+## Testing Patterns
+
+### Test File Naming
+
+```
+module.ts       → module_test.ts
+graph.ts        → graph_test.ts
+```
 
 ### Test Structure
 
-Test files use `*_test.ts` suffix adjacent to source files:
-
 ```typescript
-import { assertEquals, assertThrows } from "@std/assert";
+import { assertEquals, assertThrows } from "std/assert/mod.ts";
+import { describe, it } from "std/testing/bdd.ts";
 
-Deno.test("executionPlan creates valid topological order", () => {
-  // Arrange
-  const tasks = createTestTasks();
+describe("MyModule", () => {
+  describe("myFunction", () => {
+    it("should handle normal input", () => {
+      const result = myFunction("input");
+      assertEquals(result, "expected");
+    });
 
-  // Act
-  const plan = executionPlan(tasks);
-
-  // Assert
-  assertEquals(plan.layers.length, 3);
-  assertEquals(plan.dag.length, tasks.length);
-});
-
-Deno.test("executionPlan throws on circular dependencies", () => {
-  const circularTasks = createCircularTasks();
-  
-  assertThrows(
-    () => executionPlan(circularTasks),
-    Error,
-    "Circular dependency detected"
-  );
-});
-```
-
-### Test Coverage
-
-Cover these scenarios:
-
-<Cards>
-  <Card title="Happy Path">
-    Main use case with valid inputs
-  </Card>
-  
-  <Card title="Edge Cases">
-    Boundary conditions, empty inputs
-  </Card>
-  
-  <Card title="Error Conditions">
-    Invalid inputs and failure modes
-  </Card>
-  
-  <Card title="Integration">
-    Components working together
-  </Card>
-</Cards>
-
-### Group Related Tests
-
-```typescript
-Deno.test("TaskExecutor", async (t) => {
-  await t.step("executes single task", () => {
-    // Test implementation
-  });
-
-  await t.step("handles dependencies", () => {
-    // Test implementation
-  });
-
-  await t.step("reports failures", () => {
-    // Test implementation
+    it("should throw on invalid input", () => {
+      assertThrows(
+        () => myFunction(""),
+        Error,
+        "Input required"
+      );
+    });
   });
 });
-```
-
-### Run Tests
-
-```bash
-# Run all tests
-deno test --parallel --allow-all
-
-# Format code
-deno fmt
-
-# Lint code
-deno lint
 ```
 
 ## Documentation
 
 ### JSDoc Comments
-
-Document all public APIs:
 
 ```typescript
 /**
@@ -292,13 +260,15 @@ export function graph(
 }
 ```
 
-**When to document:**
+### When to Document
+
 - All public exports
 - Complex algorithms
 - Non-obvious behavior
 - API boundaries
 
-**When NOT to document:**
+### When NOT to Document
+
 - Self-explanatory code
 - Internal implementation details
 - Obvious getters/setters
@@ -307,183 +277,108 @@ export function graph(
 
 ### Prefer Generators for Large Collections
 
-```typescript
-// Good: Lazy evaluation
-function* findMatches(nodes: Node[]): Generator<Node> {
-  for (const node of nodes) {
-    if (matches(node)) yield node;
-  }
-}
-
-// Use when needed
-for (const match of findMatches(largeArray)) {
-  // Process one at a time
-}
-```
+<Tabs items={['Good', 'Usage']}>
+  <Tab value="Good">
+    ```typescript
+    // Good: Lazy evaluation
+    function* findMatches(nodes: Node[]): Generator<Node> {
+      for (const node of nodes) {
+        if (matches(node)) yield node;
+      }
+    }
+    ```
+  </Tab>
+  <Tab value="Usage">
+    ```typescript
+    // Use when needed
+    for (const match of findMatches(largeArray)) {
+      // Process one at a time
+    }
+    ```
+  </Tab>
+</Tabs>
 
 ### Avoid Unnecessary Allocations
 
-```typescript
-// Better: Lazy evaluate when appropriate
-function* getIds(tasks: Task[]): Generator<string> {
-  for (const task of tasks) {
-    yield task.taskId();
-  }
-}
+<Tabs items={['Avoid', 'Better']}>
+  <Tab value="Avoid">
+    ```typescript
+    // Avoid: Creates new array each call
+    function getIds(tasks: Task[]): string[] {
+      return tasks.map(t => t.taskId());
+    }
+    ```
+  </Tab>
+  <Tab value="Better">
+    ```typescript
+    // Better: Reuse or lazy evaluate if appropriate
+    function* getIds(tasks: Task[]): Generator<string> {
+      for (const task of tasks) {
+        yield task.taskId();
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Formatting
+
+Use Deno's built-in formatter:
+
+```bash
+deno fmt
 ```
 
-## Commit Message Format
+Key settings (in `deno.jsonc`):
+
+- Line width: 80
+- Indent: 2 spaces
+- Single quotes for strings
+- Trailing commas
+
+## Linting
+
+Use Deno's linter:
+
+```bash
+deno lint
+```
+
+<Callout type="warn">
+Address all warnings before committing.
+</Callout>
+
+## Commit Messages
 
 Follow conventional commits:
 
 ```
-<type>(<scope>): <description>
+type(scope): subject
 
-[optional body]
+body (optional)
 
-[optional footer]
+footer (optional)
 ```
 
-### Commit Types
+### Types
 
 | Type | Description |
 |------|-------------|
 | `feat` | New feature |
 | `fix` | Bug fix |
-| `docs` | Documentation changes |
-| `test` | Adding/updating tests |
-| `refactor` | Code refactoring |
-| `perf` | Performance improvements |
-| `chore` | Maintenance tasks |
-| `ci` | CI/CD configuration |
-
-### Commit Scopes
-
-| Scope | Description |
-|-------|-------------|
-| `axiom` | Graph engine and core abstractions |
-| `runbook` | Runbook execution and orchestration |
-| `sqlpage` | SQLPage playbook integration |
-| `task` | Task execution and planning |
-| `shell` | Shell command execution |
-| `courier` | Data movement and transformation |
+| `docs` | Documentation |
+| `refactor` | Code change (no new feature or fix) |
+| `test` | Adding tests |
+| `chore` | Maintenance |
 
 ### Examples
 
-<Tabs items={['Feature', 'Bug Fix', 'Breaking Change']}>
-  <Tab value="Feature">
-    ```
-    feat(axiom): add support for custom edge rules
-
-    Add ability to register custom edge rules for graph building.
-    This enables extensibility for domain-specific relationships.
-
-    Closes #123
-    ```
-  </Tab>
-  
-  <Tab value="Bug Fix">
-    ```
-    fix(runbook): handle missing task dependencies gracefully
-
-    Previously, missing dependencies caused a crash. Now they are
-    reported as warnings and skipped.
-
-    Fixes #456
-    ```
-  </Tab>
-  
-  <Tab value="Breaking Change">
-    ```
-    feat(task)!: change task execution API signature
-
-    BREAKING CHANGE: The executeTask function now requires
-    an options object instead of individual parameters.
-
-    Migration guide available in docs/migration.md
-    ```
-  </Tab>
-</Tabs>
-
-## Pull Request Guidelines
-
-### PR Title Format
-
-Use the same format as commit messages:
-
 ```
-feat(axiom): add custom edge rule support
-fix(runbook): resolve dependency cycle detection
-docs: improve contributing guide clarity
+feat(axiom): add support for nested dependencies
+fix(cli): handle missing file gracefully
+docs: update installation instructions
+refactor(edge): simplify rule pipeline
 ```
-
-### PR Description Template
-
-```markdown
-## What does this change?
-Brief description of the changes
-
-## Why is this needed?
-Explain the motivation and use case
-
-## How was it tested?
-- [ ] Unit tests added/updated
-- [ ] Manual testing performed
-- [ ] Documentation updated
-
-## Breaking changes?
-None / List any breaking changes
-
-## Related issues
-Closes #123
-```
-
-### Review Process
-
-<Steps>
-  <Step>
-    ### Automated Checks
-    
-    All tests, linting, and formatting must pass.
-  </Step>
-  
-  <Step>
-    ### Code Review
-    
-    Maintainer reviews and provides feedback.
-  </Step>
-  
-  <Step>
-    ### Address Feedback
-    
-    Make requested changes.
-  </Step>
-  
-  <Step>
-    ### Merge
-    
-    PR will be squashed and merged once approved.
-  </Step>
-</Steps>
-
-## File Organization
-
-```
-lib/axiom/projection/
-├── flexible.ts          # Main implementation
-├── flexible_test.ts     # Tests
-├── playbook.ts
-├── playbook_test.ts
-└── fixture/             # Test fixtures
-    ├── sample.md
-    └── complex.md
-```
-
-**Rules:**
-- One main export per file when possible
-- Tests adjacent to source files (`*_test.ts`)
-- Fixtures in `fixture/` subdirectories
-- Index files (`mod.ts`) for module exports
 
 ## Getting Help
 

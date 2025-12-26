@@ -14,7 +14,8 @@
     "dag",
     "ast",
     "architecture-pattern-edge-engineering",
-    "code-default"
+    "code-default",
+    "capture"
   ],
   "root": true
 }
